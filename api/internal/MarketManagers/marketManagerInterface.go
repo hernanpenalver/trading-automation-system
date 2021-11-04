@@ -8,6 +8,10 @@ import (
 
 type MarketManagerInterface interface {
 	Get(dateFrom, dateTo *time.Time, timeFrame strategies_context.TimeFrame) ([]domain.CandleStick, error)
-	FullBuy(quantity int, price, stopLoss, takeProfit float64) (interface{}, error)
-	FullSell(quantity int, price, stopLoss, takeProfit float64) (interface{}, error)
+	FullBuy(quantity, price, stopLoss, takeProfit float64) (*MarketOperation, error)
+	FullSell(quantity, price, stopLoss, takeProfit float64) (*MarketOperation, error)
+}
+
+type MarketOperation struct {
+	EntryPrice float64
 }

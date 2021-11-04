@@ -7,9 +7,9 @@ import (
 )
 
 type CrossingSimpleMovingAverages struct {
-	Name string
-	FastSma  *indicators.SimpleMovingAverage
-	SlowSma  *indicators.SimpleMovingAverage
+	Name    string
+	FastSma *indicators.SimpleMovingAverage
+	SlowSma *indicators.SimpleMovingAverage
 }
 
 func NewCrossingSimpleMovingAverages(fastSma *indicators.SimpleMovingAverage, slowSma *indicators.SimpleMovingAverage) *CrossingSimpleMovingAverages {
@@ -37,16 +37,18 @@ func (c *CrossingSimpleMovingAverages) GetOperation(series []domain.CandleStick)
 	if utils.CrossOver(fastSmaCollection, slowSmaCollection) {
 		// buy
 		return &domain.Operation{
-			Operation: domain.BuyAction,
-			Price:     series[len(series)-1].Close,
+			Operation:  domain.BuyAction,
+			EntryPrice: series[len(series)-1].Close,
+			Amount:     1,
 		}
 	}
 
 	if utils.CrossUnder(fastSmaCollection, slowSmaCollection) {
 		// sell
-		return &domain.Operation {
-			Operation: domain.SellAction,
-			Price:     series[len(series)-1].Close,
+		return &domain.Operation{
+			Operation:  domain.SellAction,
+			EntryPrice: series[len(series)-1].Close,
+			Amount:     1,
 		}
 	}
 
