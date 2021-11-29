@@ -41,3 +41,13 @@ func (sma * SimpleMovingAverage) calculate(series []domain.CandleStick, position
 
 	return sum/float64(sma.Length)
 }
+
+func (sma *SimpleMovingAverage) SetNextConfiguration() bool {
+	maxLength := 20
+	if sma.Length < maxLength {
+		sma.Length += 1
+		return true
+	}
+
+	return false
+}

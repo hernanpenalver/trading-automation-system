@@ -42,19 +42,21 @@ func (b *BinanceApi) Get(symbol string, interval string, dateFrom *time.Time, da
 
 	var candleStickCollection []domain.CandleStick
 	for _, r := range binanceResponse {
-		candleStickCollection = append(candleStickCollection, b.parseResponse(r))
+		candleStickCollection = append(candleStickCollection, b.ParseResponse(r))
 	}
 
 	return candleStickCollection, nil
 }
 
-func (b *BinanceApi) parseResponse(data []interface{}) domain.CandleStick {
+func (b *BinanceApi) ParseResponse(data []interface{}) domain.CandleStick {
 	openTime := data[0].(float64)
 	closeTime := data[6].(float64)
 	closePrice, _ := strconv.ParseFloat(data[4].(string), 64)
 	open, _ := strconv.ParseFloat(data[1].(string), 64)
 	max, _ := strconv.ParseFloat(data[2].(string), 64)
 	min, _ := strconv.ParseFloat(data[3].(string), 64)
+
+	openDateTime := time.Unix(0, int64(openTime) * int64(time.Millisecond))
 
 	return domain.CandleStick{
 		OpenTime:  openTime,
@@ -63,5 +65,6 @@ func (b *BinanceApi) parseResponse(data []interface{}) domain.CandleStick {
 		Open:      open,
 		Max:       max,
 		Min:       min,
+		OpenDateTime: openDateTime.String(),
 	}
 }

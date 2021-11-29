@@ -1,18 +1,38 @@
 package main
 
 import (
-	"fmt"
-	"time"
-	"trading-automation-system/api/internal/MarketManagers/clients"
+	"trading-automation-system/api/internal/MarketManagers"
+	"trading-automation-system/api/internal/domain"
+	"trading-automation-system/api/internal/executors"
+	"trading-automation-system/api/internal/presenters"
+	"trading-automation-system/api/internal/strategies_context"
 )
 
 func main() {
-	bapi := clients.BinanceApi{}
+	exec()
+}
 
-	symbol := "BNBBTC"
-	interval := "5m"
-	dateFrom := time.Date(2021, 1, 1, 1, 1, 1, 1, time.UTC)
-	dateTo := time.Date(2021, 2, 1, 1, 1, 1, 1, time.UTC)
-	a, _ := bapi.Get(symbol, interval, &dateFrom, &dateTo)
-	fmt.Print(a[0])
+func exec(){
+	//fastSma := indicators.NewSimpleMovingAverage(20, indicators.CloseSource)
+	//slowSma := indicators.NewSimpleMovingAverage(50, indicators.CloseSource)
+	//
+	//crossingSimpleMovingAverages := strategies.NewCrossingSimpleMovingAverages(fastSma, slowSma)
+
+	defaultExecutor := executors.NewDefaultExecutor(&MarketManagers.MockedMarketManager{})
+
+	defaultStrategyContext := strategies_context.DefaultStrategyContext{}
+	defaultStrategyContext.InitDefaultValues()
+
+	var results []*domain.StrategyExecutorResult
+	for defaultStrategyContext.Strategy.NextConfigurations() {
+		defaultExecutorResult, err := defaultExecutor.Run(&defaultStrategyContext)
+		if err != nil {
+			print(err)
+		}
+		results = append(results, defaultExecutorResult)
+	}
+
+	consolePresenter := presenters.NewConsolePresenter()
+
+	consolePresenter.Execute(results)
 }

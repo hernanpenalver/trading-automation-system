@@ -13,5 +13,6 @@ type MarketManagerInterface interface {
 }
 
 type MarketOperation struct {
+	Quantity   float64
 	EntryPrice float64
 }

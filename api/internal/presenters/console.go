@@ -6,14 +6,29 @@ import (
 )
 
 type ConsolePresenter struct {
-
 }
 
-func (c *ConsolePresenter) Execute(strategyResult *domain.StrategyExecutorResult)  {
-	var netBalance float64
-	for _, co := range strategyResult.ClosedOperations {
-		netBalance += co.GetNetBalance()
-	}
+func NewConsolePresenter() *ConsolePresenter {
+	return &ConsolePresenter{}
+}
 
-	log.Printf("Net Balance: %f", netBalance)
+func (c *ConsolePresenter) Execute(strategyResult []*domain.StrategyExecutorResult)  {
+
+	log.Printf("RESULTADOS")
+	for _, s := range strategyResult {
+		if s.GetStrategyBalance() > 0 {
+			c.execute(s)
+		}
+	}
+}
+
+func (c *ConsolePresenter) execute(strategyResult *domain.StrategyExecutorResult)  {
+	//log.Printf("Potential operations: %d", len(strategyResult.PotentialOperations))
+	//log.Printf("Operations: %d", len(strategyResult.OpenedOperations))
+	//log.Printf("Winners: %d", strategyResult.GetWinnersQuantity())
+	//log.Printf("Losers: %d", strategyResult.GetLosersQuantity())
+	//log.Printf("Complete Balance: %f", strategyResult.GetCompleteBalance())
+	log.Printf("Strategy Balance: %f", strategyResult.GetStrategyBalance())
+	log.Printf("Strategy Percent Balance: %f", strategyResult.GetStrategyPercentBalance())
+	log.Printf("Strategy Investment Balance: %f", strategyResult.GetInvestmentBalance(100))
 }

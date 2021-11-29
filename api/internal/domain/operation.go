@@ -1,5 +1,7 @@
 package domain
 
+import "trading-automation-system/api/internal/utils"
+
 type Operation struct {
 	ID         string
 	Operation  Action
@@ -69,7 +71,21 @@ func (o *Operation) GetNetBalance() float64 {
 	return 0
 }
 
-//func (o *Operation) GetPercentBalance(lastCandleStick *CandleStick) bool {}
+func (o *Operation) GetPercentNetBalance() float64 {
+	if o.CloseData == nil {
+		return 0
+	}
+
+	if o.IsBuy() {
+		return utils.GetPercentageOf(o.EntryPrice, (o.Amount * o.CloseData.Price) - (o.Amount * o.EntryPrice))
+	}
+
+	if o.IsSell() {
+		return utils.GetPercentageOf(o.EntryPrice, (o.Amount * o.EntryPrice) - (o.Amount * o.CloseData.Price))
+	}
+
+	return 0
+}
 
 type Action string
 
@@ -84,5 +100,6 @@ type CloseReason string
 const (
 	StopLossReason          CloseReason = "stop_loss"
 	TakeProfitReason        CloseReason = "take_profit"
+	ForceCloseReason        CloseReason = "force_close"
 	StrategyConditionReason CloseReason = "strategy_condition"
 )

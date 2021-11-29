@@ -1,4 +1,4 @@
-package utils
+package series
 
 import "trading-automation-system/api/internal/domain"
 
@@ -6,6 +6,10 @@ func CrossOver(serieA []float64, serieB []float64) bool {
 	length := 4
 	seriesQty := len(serieA)
 	crossover := false
+
+	if len(serieA) < length || len(serieB) < length {
+		return crossover
+	}
 
 	if serieA[seriesQty-length] < serieB[seriesQty-length] &&
 		serieA[seriesQty-(length-1)] < serieB[seriesQty-(length-1)] &&
@@ -22,6 +26,10 @@ func CrossUnder(serieA []float64, serieB []float64) bool {
 	length := 4
 	seriesQty := len(serieA)
 	crossunder := false
+
+	if len(serieA) < length || len(serieB) < length {
+		return crossunder
+	}
 
 	if serieA[seriesQty-length] > serieB[seriesQty-length] &&
 		serieA[seriesQty-(length-1)] > serieB[seriesQty-(length-1)] &&
@@ -42,4 +50,21 @@ func CollectClosePrices(series []domain.CandleStick) []float64 {
 	}
 
 	return collection
+}
+
+func RemoveOrderedByID(slice []*domain.Operation, ID string) []*domain.Operation {
+	if i, found := getIndexByID(slice, ID); found {
+		return append(slice[:i], slice[i+1:]...)
+	}
+
+	return slice
+}
+
+func getIndexByID(slice []*domain.Operation, ID string) (int, bool) {
+	for i, o := range slice {
+		if o.ID == ID {
+			return i, true
+		}
+	}
+	return 0, false
 }
