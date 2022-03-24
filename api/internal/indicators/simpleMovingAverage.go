@@ -51,3 +51,12 @@ func (sma *SimpleMovingAverage) SetNextConfiguration() bool {
 
 	return false
 }
+
+func (sma *SimpleMovingAverage) GetNextConfiguration() *SimpleMovingAverage {
+	maxLength := 20
+	if sma.Length < maxLength {
+		return NewSimpleMovingAverage(sma.Length + 1, sma.Source)
+	}
+
+	return nil
+}

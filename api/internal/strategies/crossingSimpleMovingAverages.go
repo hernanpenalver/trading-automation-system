@@ -23,6 +23,10 @@ func NewCrossingSimpleMovingAverages(fastSma *indicators.SimpleMovingAverage, sl
 	}
 }
 
+func (c *CrossingSimpleMovingAverages) GetName() string{
+	return c.Name
+}
+
 func (c *CrossingSimpleMovingAverages) InitDefaultValues() {
 	if c.FastSma == nil {
 		c.FastSma = &indicators.SimpleMovingAverage{}
@@ -72,7 +76,7 @@ func (c *CrossingSimpleMovingAverages) GetOperation(candleStickList []domain.Can
 
 func (c *CrossingSimpleMovingAverages) NextConfigurations() bool {
 	if !c.FastSma.SetNextConfiguration() {
-		c.FastSma.Length = 10
+		c.FastSma.Length = 1
 		if !c.SlowSma.SetNextConfiguration() {
 			return false
 		}
@@ -80,4 +84,18 @@ func (c *CrossingSimpleMovingAverages) NextConfigurations() bool {
 
 	fmt.Printf("slowSma: %d, fastSma: %d\n", c.SlowSma.Length, c.FastSma.Length)
 	return true
+}
+
+func (c *CrossingSimpleMovingAverages) GetNextConfiguration() *CrossingSimpleMovingAverages {
+	newFastSma := c.FastSma.GetNextConfiguration()
+	newSlowSma := c.SlowSma
+	if newFastSma == nil {
+		c.FastSma.Length = 1
+		newSlowSma = c.SlowSma.GetNextConfiguration()
+		if newSlowSma == nil {
+			return nil
+		}
+	}
+
+	return NewCrossingSimpleMovingAverages(newFastSma, newSlowSma)
 }

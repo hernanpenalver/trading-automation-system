@@ -15,7 +15,7 @@ func NewDefaultExecutor(marketManager MarketManagers.MarketManagerInterface) *De
 	return &DefaultExecutor{marketManager: marketManager}
 }
 
-func (d *DefaultExecutor) Run(strContext *strategies_context.DefaultStrategyContext) (*domain.StrategyExecutorResult, error) {
+func (d *DefaultExecutor) Run(strContext *strategies_context.StrategyContext) (*domain.StrategyExecutorResult, error) {
 	candleStickList, err := d.marketManager.Get(strContext.DateFrom, strContext.DateTo, strContext.TimeFrame)
 	if err != nil {
 		return nil, err

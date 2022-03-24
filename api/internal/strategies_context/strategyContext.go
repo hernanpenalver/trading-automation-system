@@ -6,7 +6,7 @@ import (
 	"trading-automation-system/api/internal/strategies"
 )
 
-type DefaultStrategyContext struct {
+type StrategyContext struct {
 	Investment *domain.Investment
 	Strategy  strategies.StrategyInterface
 	TimeFrame TimeFrame
@@ -14,11 +14,11 @@ type DefaultStrategyContext struct {
 	DateTo    *time.Time
 }
 
-func NewDefaultStrategyContext(strategy strategies.StrategyInterface, timeFrame TimeFrame, dateFrom *time.Time, dateTo *time.Time) *DefaultStrategyContext {
-	return &DefaultStrategyContext{Strategy: strategy, TimeFrame: timeFrame, DateFrom: dateFrom, DateTo: dateTo}
+func NewStrategyContext(strategy strategies.StrategyInterface, timeFrame TimeFrame, dateFrom *time.Time, dateTo *time.Time) *StrategyContext {
+	return &StrategyContext{Strategy: strategy, TimeFrame: timeFrame, DateFrom: dateFrom, DateTo: dateTo}
 }
 
-func (d *DefaultStrategyContext) InitDefaultValues() {
+func (d *StrategyContext) InitDefaultValues() {
 	if d.Investment == nil {
 		d.Investment = &domain.Investment{
 			Amount: 100,

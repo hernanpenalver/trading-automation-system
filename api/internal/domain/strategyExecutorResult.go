@@ -69,7 +69,7 @@ func (s *StrategyExecutorResult) GetStrategyPercentBalance() float64 {
 func (s *StrategyExecutorResult) GetInvestmentBalance(investmentAmount float64) float64 {
 	for _, co := range s.ClosedOperations {
 		if co.CloseData.Reason == TakeProfitReason || co.CloseData.Reason == StopLossReason {
-			percent := co.GetNetBalance()
+			percent := co.GetPercentNetBalance()
 			investmentAmount = utils.PlusPercentage(investmentAmount, percent)
 		}
 	}
