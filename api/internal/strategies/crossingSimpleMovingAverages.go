@@ -23,7 +23,7 @@ func NewCrossingSimpleMovingAverages(fastSma *indicators.SimpleMovingAverage, sl
 	}
 }
 
-func (c *CrossingSimpleMovingAverages) GetName() string{
+func (c *CrossingSimpleMovingAverages) GetName() string {
 	return c.Name
 }
 
@@ -86,16 +86,16 @@ func (c *CrossingSimpleMovingAverages) NextConfigurations() bool {
 	return true
 }
 
-func (c *CrossingSimpleMovingAverages) GetNextConfiguration() *CrossingSimpleMovingAverages {
-	newFastSma := c.FastSma.GetNextConfiguration()
-	newSlowSma := c.SlowSma
-	if newFastSma == nil {
-		c.FastSma.Length = 1
-		newSlowSma = c.SlowSma.GetNextConfiguration()
-		if newSlowSma == nil {
-			return nil
-		}
-	}
-
-	return NewCrossingSimpleMovingAverages(newFastSma, newSlowSma)
-}
+//func (c *CrossingSimpleMovingAverages) GetNextConfiguration() *CrossingSimpleMovingAverages {
+//	newFastSma := c.FastSma.GetNextConfiguration()
+//	newSlowSma := c.SlowSma
+//	if newFastSma == nil {
+//		c.FastSma.Length = 1
+//		newSlowSma = c.SlowSma.GetNextConfiguration()
+//		if newSlowSma == nil {
+//			return nil
+//		}
+//	}
+//
+//	return NewCrossingSimpleMovingAverages(newFastSma, newSlowSma)
+//}

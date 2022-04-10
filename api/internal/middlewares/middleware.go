@@ -2,17 +2,9 @@ package middlewares
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/prometheus/client_golang/prometheus"
-)
-
-var totalRequests = prometheus.NewCounterVec(
-	prometheus.CounterOpts{
-		Name: "http_requests_total",
-		Help: "Number of get requests.",
-	},
-	[]string{"path"},
+	"trading-automation-system/api/internal/metrics"
 )
 
 func CountRequests(c *gin.Context) {
-	totalRequests.WithLabelValues(c.Request.RequestURI).Inc()
+	metrics.TotalRequests.WithLabelValues(c.Request.RequestURI).Inc()
 }

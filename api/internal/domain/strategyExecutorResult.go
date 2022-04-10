@@ -1,6 +1,8 @@
 package domain
 
-import "trading-automation-system/api/internal/utils"
+import (
+	"trading-automation-system/api/internal/utils"
+)
 
 type StrategyExecutorResult struct {
 	PotentialOperations []*Operation

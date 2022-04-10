@@ -14,6 +14,7 @@ RUN go build -o main ./api/cmd/main.go
 FROM alpine:3.15
 WORKDIR /app
 COPY --from=builder /app/main .
+COPY . .
 
 # Expose port 9000 to the outside world
 EXPOSE 9000

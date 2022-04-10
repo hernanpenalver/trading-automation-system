@@ -5,13 +5,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"trading-automation-system/api/internal/MarketManagers"
+	"trading-automation-system/api/internal/executors"
 	"trading-automation-system/api/internal/handlers"
 	"trading-automation-system/api/internal/metrics"
 	"trading-automation-system/api/internal/middlewares"
+	"trading-automation-system/api/internal/services"
 )
 
 func init() {
 	prometheus.MustRegister(metrics.TotalRequests)
+	prometheus.MustRegister(metrics.StrategiesResults)
 }
 
 func prometheusHandler() gin.HandlerFunc {
@@ -23,9 +27,18 @@ func prometheusHandler() gin.HandlerFunc {
 }
 
 func main() {
+	//dependencies := InjectDependencies()
+
+	marketManager := &MarketManagers.MockedMarketManager{}
+	strategyExecutor := executors.NewDefaultStrategyExecutor(marketManager)
+	genericExecutorService := services.NewGenericExecutor(strategyExecutor)
+	genericExecutor := handlers.NewGenericExecutor(genericExecutorService)
+
 	router := gin.New()
 	router.Use(middlewares.CountRequests)
+
 	router.GET("/ping", handlers.Ping)
+	router.POST("/execute", genericExecutor.Execute)
 	router.GET("/prometheus", prometheusHandler())
 
 	fmt.Println("Serving requests on port 9000")
@@ -34,37 +47,3 @@ func main() {
 		panic(err)
 	}
 }
-
-//func exec() {
-//
-//	datadog.New()
-//
-//	defaultExecutor := executors.NewDefaultExecutor(&MarketManagers.MockedMarketManager{})
-//
-//	strategyContext := &strategies_context.StrategyContext{}
-//	strategyContext.InitDefaultValues()
-//
-//	fastSma := indicators.NewSimpleMovingAverage(1, indicators.CloseSource)
-//	slowSma := indicators.NewSimpleMovingAverage(1, indicators.CloseSource)
-//	crossingSimpleMovingAverages := strategies.NewCrossingSimpleMovingAverages(fastSma, slowSma)
-//
-//	strategyContext.Strategy = crossingSimpleMovingAverages
-//	dateFrom := time.Unix(0, int64(1636232400000)*int64(time.Millisecond))
-//	dateTo := time.Unix(0, int64(1638032399999)*int64(time.Millisecond))
-//	strategyContext.DateFrom = &dateFrom
-//	strategyContext.DateTo = &dateTo
-//
-//	var results []*domain.StrategyExecutorResult
-//	for strategyContext.Strategy.NextConfigurations() {
-//		defaultExecutorResult, err := defaultExecutor.Run(strategyContext)
-//		if err != nil {
-//			print(err)
-//		}
-//		results = append(results, defaultExecutorResult)
-//	}
-//
-//	consolePresenter := presenters.NewConsolePresenter()
-//
-//	consolePresenter.Execute(strategyContext, results)
-//}
-//

@@ -1,0 +1,22 @@
+{
+  "strategies": [
+    {
+      "name": "crossing_simple_moving_average",
+      "parameters": {
+        "slow_sma": {
+          "length": 100
+        },
+        "fast_sma": {
+          "length": 50
+        }
+      }
+    }
+  ],
+  "investment": {
+    "initial_amount": 1
+  },
+  "date_from": "2006-01-02T15:04:05Z07:00",
+  "date_to": "2006-01-02T15:04:05Z07:00",
+  "timeframe": "5s",
+  "symbol": ["BTCUSDT"]
+}

@@ -8,3 +8,6 @@ docker run --name golangapp -p 9000:9000 golangapp:latest
 
 # RUN docker compose
 docker-compose up -d
+
+# RUN docker compose + rebuild
+docker-compose up -d --build

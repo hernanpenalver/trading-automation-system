@@ -6,13 +6,13 @@ import (
 	"os"
 	"time"
 	"trading-automation-system/api/internal/MarketManagers/clients"
+	"trading-automation-system/api/internal/constants"
 	"trading-automation-system/api/internal/domain"
-	"trading-automation-system/api/internal/strategies_context"
 )
 
 type MockedMarketManager struct{}
 
-func (m *MockedMarketManager) Get(dateFrom, dateTo *time.Time, timeFrame strategies_context.TimeFrame) ([]domain.CandleStick, error) {
+func (m *MockedMarketManager) Get(dateFrom, dateTo *time.Time, timeFrame constants.TimeFrame) ([]domain.CandleStick, error) {
 	jsonFile, err := os.Open("./api/internal/mocks/historical_BTCUSDT_1h.json")
 	// if we os.Open returns an error then handle it
 	if err != nil {

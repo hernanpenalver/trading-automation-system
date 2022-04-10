@@ -7,15 +7,15 @@ import (
 	"trading-automation-system/api/internal/utils/series"
 )
 
-type DefaultExecutor struct {
+type DefaultStrategyExecutor struct {
 	marketManager MarketManagers.MarketManagerInterface
 }
 
-func NewDefaultExecutor(marketManager MarketManagers.MarketManagerInterface) *DefaultExecutor {
-	return &DefaultExecutor{marketManager: marketManager}
+func NewDefaultStrategyExecutor(marketManager MarketManagers.MarketManagerInterface) *DefaultStrategyExecutor {
+	return &DefaultStrategyExecutor{marketManager: marketManager}
 }
 
-func (d *DefaultExecutor) Run(strContext *strategies_context.StrategyContext) (*domain.StrategyExecutorResult, error) {
+func (d *DefaultStrategyExecutor) Run(strContext *strategies_context.StrategyContext) (*domain.StrategyExecutorResult, error) {
 	candleStickList, err := d.marketManager.Get(strContext.DateFrom, strContext.DateTo, strContext.TimeFrame)
 	if err != nil {
 		return nil, err

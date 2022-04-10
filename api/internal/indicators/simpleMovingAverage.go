@@ -9,11 +9,12 @@ type SimpleMovingAverage struct {
 }
 
 type MovingAverageSource string
+
 const CloseSource MovingAverageSource = "close"
 
 func NewSimpleMovingAverage(length int, source MovingAverageSource) *SimpleMovingAverage {
 	return &SimpleMovingAverage{
-		Name: "Simple Moving Average",
+		Name:   "Simple Moving Average",
 		Length: length,
 		Source: source,
 	}
@@ -26,24 +27,24 @@ func (sma *SimpleMovingAverage) Calculate(series []domain.CandleStick) []float64
 		return smaCollection
 	}
 
-	for i := sma.Length-1; i < len(series); i++ {
+	for i := sma.Length - 1; i < len(series); i++ {
 		smaCollection[i] = sma.calculate(series, i)
 	}
 
 	return smaCollection
 }
 
-func (sma * SimpleMovingAverage) calculate(series []domain.CandleStick, position int) float64 {
+func (sma *SimpleMovingAverage) calculate(series []domain.CandleStick, position int) float64 {
 	var sum float64
-	for i := position-(sma.Length-1); i <= position; i++ {
+	for i := position - (sma.Length - 1); i <= position; i++ {
 		sum += series[i].Close
 	}
 
-	return sum/float64(sma.Length)
+	return sum / float64(sma.Length)
 }
 
 func (sma *SimpleMovingAverage) SetNextConfiguration() bool {
-	maxLength := 20
+	maxLength := 5
 	if sma.Length < maxLength {
 		sma.Length += 1
 		return true
@@ -53,9 +54,9 @@ func (sma *SimpleMovingAverage) SetNextConfiguration() bool {
 }
 
 func (sma *SimpleMovingAverage) GetNextConfiguration() *SimpleMovingAverage {
-	maxLength := 20
+	maxLength := 5
 	if sma.Length < maxLength {
-		return NewSimpleMovingAverage(sma.Length + 1, sma.Source)
+		return NewSimpleMovingAverage(sma.Length+1, sma.Source)
 	}
 
 	return nil
