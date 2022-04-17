@@ -9,13 +9,12 @@ import (
 	"trading-automation-system/api/internal/executors"
 	"trading-automation-system/api/internal/handlers"
 	"trading-automation-system/api/internal/metrics"
-	"trading-automation-system/api/internal/middlewares"
 	"trading-automation-system/api/internal/services"
 )
 
 func init() {
-	prometheus.MustRegister(metrics.TotalRequests)
-	prometheus.MustRegister(metrics.StrategiesResults)
+	prometheus.MustRegister(metrics.StrategiesResultsByInvestment)
+	prometheus.MustRegister(metrics.StrategiesResultsByPercentBalance)
 }
 
 func prometheusHandler() gin.HandlerFunc {
@@ -35,7 +34,6 @@ func main() {
 	genericExecutor := handlers.NewGenericExecutor(genericExecutorService)
 
 	router := gin.New()
-	router.Use(middlewares.CountRequests)
 
 	router.GET("/ping", handlers.Ping)
 	router.POST("/execute", genericExecutor.Execute)

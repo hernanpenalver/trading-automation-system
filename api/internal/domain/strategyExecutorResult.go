@@ -56,16 +56,12 @@ func (s *StrategyExecutorResult) GetLosersQuantity() int64 {
 	return losers
 }
 
-func (s *StrategyExecutorResult) GetStrategyPercentBalance() float64 {
-	var strategyBalance float64
-
-	for _, co := range s.ClosedOperations {
-		if co.CloseData.Reason == TakeProfitReason || co.CloseData.Reason == StopLossReason {
-			strategyBalance += co.GetPercentNetBalance()
-		}
+func (s *StrategyExecutorResult) GetStrategyPercentBalance(investmentAmount float64) float64 {
+	if investmentAmount == 0 {
+		investmentAmount = 100
 	}
 
-	return strategyBalance
+	return utils.GetPercentageOf(investmentAmount, s.GetInvestmentBalance(investmentAmount)) - 100
 }
 
 func (s *StrategyExecutorResult) GetInvestmentBalance(investmentAmount float64) float64 {

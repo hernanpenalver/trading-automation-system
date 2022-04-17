@@ -3,6 +3,7 @@ package strategies
 import (
 	"fmt"
 	"github.com/google/uuid"
+	"trading-automation-system/api/internal/constants"
 	"trading-automation-system/api/internal/domain"
 	"trading-automation-system/api/internal/indicators"
 	"trading-automation-system/api/internal/utils"
@@ -13,6 +14,20 @@ type CrossingSimpleMovingAverages struct {
 	Name    string
 	FastSma *indicators.SimpleMovingAverage
 	SlowSma *indicators.SimpleMovingAverage
+}
+
+const slowSma = "slow_sma"
+const fastSma = "fast_sma"
+
+func NewCrossingSimpleMovingAveragesFromMap(parameters map[string]interface{}) *CrossingSimpleMovingAverages {
+
+	aux := parameters[fastSma].(map[string]interface{})
+
+	return &CrossingSimpleMovingAverages{
+		Name:    constants.CrossingSimpleMovingAverage,
+		FastSma: indicators.NewSimpleMovingAverageFromMap(aux),
+		SlowSma: indicators.NewSimpleMovingAverageFromMap(parameters[slowSma].(map[string]interface{})),
+	}
 }
 
 func NewCrossingSimpleMovingAverages(fastSma *indicators.SimpleMovingAverage, slowSma *indicators.SimpleMovingAverage) *CrossingSimpleMovingAverages {

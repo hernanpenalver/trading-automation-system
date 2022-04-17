@@ -4,7 +4,6 @@ import (
 	"log"
 	"trading-automation-system/api/internal/domain"
 	"trading-automation-system/api/internal/executors"
-	"trading-automation-system/api/internal/indicators"
 	"trading-automation-system/api/internal/presenters"
 	"trading-automation-system/api/internal/strategies"
 	"trading-automation-system/api/internal/strategies_context"
@@ -19,24 +18,25 @@ func NewGenericExecutor(strategyExecutor executors.StrategyExecutorInterface) *G
 }
 
 func (e *GenericExecutor) Execute(config domain.ExecutionConfig) error {
-	aux := strategies.NewCrossingSimpleMovingAverages(
-		indicators.NewSimpleMovingAverage(config.Strategies[0].Parameters.FastSma.Length, indicators.CloseSource),
-		indicators.NewSimpleMovingAverage(config.Strategies[0].Parameters.SlowSma.Length, indicators.CloseSource))
-
-	strategyContext := strategies_context.NewStrategyContext(aux, config.Investment.InitialAmount, config.Timeframe, config.GetDateFrom(), config.GetDateTo())
+	strategy := strategies.GetStrategyRepository(config.Strategies[0].Name, config.Strategies[0].Parameters)
+	strategyContext := strategies_context.NewStrategyContext(strategy, config.Investment.InitialAmount, config.Timeframe, config.GetDateFrom(), config.GetDateTo())
 
 	var results []*domain.StrategyExecutorResult
-	for strategyContext.Strategy.NextConfigurations() {
-		defaultExecutorResult, err := e.strategyExecutor.Run(strategyContext)
-		if err != nil {
-			log.Print("GenericExecutor.execute err: ", err)
-		}
-		results = append(results, defaultExecutorResult)
+	defaultExecutorResult, err := e.strategyExecutor.Run(strategyContext)
+	if err != nil {
+		log.Print("GenericExecutor.execute - error executing strategy: ", err)
+	}
+
+	results = append(results, defaultExecutorResult)
+	if results == nil || len(results) == 0 {
+		log.Printf("No results for strategy: %s", strategyContext.Strategy.GetName())
 	}
 
 	consolePresenter := presenters.NewConsolePresenter()
+	metricPresenter := presenters.NewMetricPresenter()
 
 	consolePresenter.Execute(strategyContext, results)
+	metricPresenter.Execute(strategyContext, results)
 
 	return nil
 }

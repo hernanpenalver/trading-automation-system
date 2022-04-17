@@ -1,7 +1,6 @@
 package metrics
 
 import (
-	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -13,14 +12,24 @@ var TotalRequests = prometheus.NewCounterVec(
 	[]string{"path"},
 )
 
-var StrategiesResults = prometheus.NewCounterVec(
-	prometheus.CounterOpts{
-		Name: "custom_strategies_results",
+var StrategiesResultsByInvestment = prometheus.NewGaugeVec(
+	prometheus.GaugeOpts{
+		Name: "strategies_results_by_investment",
 		Help: "Result of strategy execution",
 	},
-	[]string{"strategy", "investmentBalance"},
-)
+	[]string{"strategy"})
 
-func MetricStrategiesResults(strategyName string, investmentBalance float64) {
-	StrategiesResults.WithLabelValues(strategyName, fmt.Sprintf("%f", investmentBalance)).Inc()
+var StrategiesResultsByPercentBalance = prometheus.NewGaugeVec(
+	prometheus.GaugeOpts{
+		Name: "strategies_results_by_percent_balance",
+		Help: "Result of strategy execution",
+	},
+	[]string{"strategy"})
+
+func MetricStrategyResultByInvestment(strategyName string, investmentBalance float64) {
+	StrategiesResultsByInvestment.WithLabelValues(strategyName).Set(investmentBalance)
+}
+
+func MetricStrategyResultByPercentBalance(strategyName string, balance float64) {
+	StrategiesResultsByPercentBalance.WithLabelValues(strategyName).Set(balance)
 }

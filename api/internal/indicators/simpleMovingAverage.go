@@ -1,6 +1,9 @@
 package indicators
 
-import "trading-automation-system/api/internal/domain"
+import (
+	"trading-automation-system/api/internal/constants"
+	"trading-automation-system/api/internal/domain"
+)
 
 type SimpleMovingAverage struct {
 	Name   string
@@ -11,6 +14,18 @@ type SimpleMovingAverage struct {
 type MovingAverageSource string
 
 const CloseSource MovingAverageSource = "close"
+
+const length = "length"
+
+func NewSimpleMovingAverageFromMap(parameters map[string]interface{}) *SimpleMovingAverage {
+	aux := int(parameters[length].(float64))
+
+	return &SimpleMovingAverage{
+		Name:   constants.SimpleMovingAverage,
+		Length: aux,
+		Source: CloseSource,
+	}
+}
 
 func NewSimpleMovingAverage(length int, source MovingAverageSource) *SimpleMovingAverage {
 	return &SimpleMovingAverage{

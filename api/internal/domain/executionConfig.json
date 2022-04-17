@@ -4,10 +4,14 @@
       "name": "crossing_simple_moving_average",
       "parameters": {
         "slow_sma": {
-          "length": 100
+          "fixed_length": 1,
+          "min_length": 1,
+          "max_length": 2
         },
         "fast_sma": {
-          "length": 50
+          "fixed_length": 1,
+          "min_length": 1,
+          "max_length": 2
         }
       }
     }
