@@ -6,5 +6,5 @@ import (
 )
 
 type Presenter interface {
-	Execute (strategyContext *strategies_context.StrategyContext, result *domain.StrategyExecutorResult)
+	Execute(*domain.StrategyConfig, *strategies_context.StrategyContext, *domain.StrategyExecutorResult)
 }

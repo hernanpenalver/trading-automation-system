@@ -3,6 +3,7 @@ package executors
 import (
 	"trading-automation-system/api/internal/MarketManagers"
 	"trading-automation-system/api/internal/domain"
+	"trading-automation-system/api/internal/strategies"
 	"trading-automation-system/api/internal/strategies_context"
 	"trading-automation-system/api/internal/utils/series"
 )
@@ -15,7 +16,7 @@ func NewDefaultStrategyExecutor(marketManager MarketManagers.MarketManagerInterf
 	return &DefaultStrategyExecutor{marketManager: marketManager}
 }
 
-func (d *DefaultStrategyExecutor) Run(strContext *strategies_context.StrategyContext) (*domain.StrategyExecutorResult, error) {
+func (d *DefaultStrategyExecutor) Run(strategy strategies.StrategyInterface, strContext *strategies_context.StrategyContext) (*domain.StrategyExecutorResult, error) {
 	candleStickList, err := d.marketManager.Get(strContext.DateFrom, strContext.DateTo, strContext.TimeFrame)
 	if err != nil {
 		return nil, err
@@ -25,7 +26,7 @@ func (d *DefaultStrategyExecutor) Run(strContext *strategies_context.StrategyCon
 	var closedOperations []*domain.Operation
 	var openedOperations []*domain.Operation
 	for i := range candleStickList {
-		operation := strContext.Strategy.GetOperation(candleStickList[0:i])
+		operation := strategy.GetOperation(candleStickList[0:i])
 
 		if operation != nil {
 			potentialOperations = append(potentialOperations, operation)

@@ -18,25 +18,61 @@ func NewGenericExecutor(strategyExecutor executors.StrategyExecutorInterface) *G
 }
 
 func (e *GenericExecutor) Execute(config domain.ExecutionConfig) error {
-	strategy := strategies.GetStrategyRepository(config.Strategies[0].Name, config.Strategies[0].Parameters)
-	strategyContext := strategies_context.NewStrategyContext(strategy, config.Investment.InitialAmount, config.Timeframe, config.GetDateFrom(), config.GetDateTo())
+	consolePresenter := presenters.NewConsolePresenter()
+	metricPresenter := presenters.NewMetricPresenter()
+	strategyContext := strategies_context.NewStrategyContext(config.Investment.InitialAmount, config.Timeframe, config.GetDateFrom(), config.GetDateTo())
 
-	var results []*domain.StrategyExecutorResult
-	defaultExecutorResult, err := e.strategyExecutor.Run(strategyContext)
+	for _, s := range config.Strategies {
+		var results []*domain.StrategyExecutorResult
+
+		//Ejecucion con parametros de entrada
+		defaultExecutorResult := e.execute(s, strategyContext)
+		results = append(results, defaultExecutorResult)
+
+		for {
+			if ok, parameters := getNextConfiguration(s.Parameters); ok {
+				s.Parameters = parameters
+
+				defaultExecutorResult := e.execute(s, strategyContext)
+				results = append(results, defaultExecutorResult)
+			} else {
+				break
+			}
+		}
+
+		consolePresenter.Execute(s, strategyContext, results)
+		metricPresenter.Execute(s, strategyContext, results)
+	}
+
+	return nil
+}
+
+func (e *GenericExecutor) execute(strategyConfig *domain.StrategyConfig, strategyContext *strategies_context.StrategyContext) *domain.StrategyExecutorResult {
+	log.Print(strategyConfig.Parameters[0].Value, " + ", strategyConfig.Parameters[1].Value)
+	strategy := strategies.GetStrategyRepository(strategyConfig)
+	defaultExecutorResult, err := e.strategyExecutor.Run(strategy, strategyContext)
 	if err != nil {
 		log.Print("GenericExecutor.execute - error executing strategy: ", err)
 	}
 
-	results = append(results, defaultExecutorResult)
-	if results == nil || len(results) == 0 {
-		log.Printf("No results for strategy: %s", strategyContext.Strategy.GetName())
+	return defaultExecutorResult
+}
+
+func getNextConfiguration(parameters []*domain.Parameter) (bool, []*domain.Parameter) {
+
+	for _, parameter := range parameters {
+		if parameter.Min == -1 || parameter.Max == -1 {
+			continue
+		}
+
+		if parameter.Value >= parameter.Min && parameter.Value < parameter.Max {
+			parameter.Value += 1
+			return true, parameters
+		} else if parameter.Value >= parameter.Max {
+			parameter.Value = parameter.Min
+			continue
+		}
 	}
 
-	consolePresenter := presenters.NewConsolePresenter()
-	metricPresenter := presenters.NewMetricPresenter()
-
-	consolePresenter.Execute(strategyContext, results)
-	metricPresenter.Execute(strategyContext, results)
-
-	return nil
+	return false, parameters
 }

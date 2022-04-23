@@ -19,14 +19,12 @@ type CrossingSimpleMovingAverages struct {
 const slowSma = "slow_sma"
 const fastSma = "fast_sma"
 
-func NewCrossingSimpleMovingAveragesFromMap(parameters map[string]interface{}) *CrossingSimpleMovingAverages {
-
-	aux := parameters[fastSma].(map[string]interface{})
+func NewCrossingSimpleMovingAveragesFromConfig(strategyConfig *domain.StrategyConfig) *CrossingSimpleMovingAverages {
 
 	return &CrossingSimpleMovingAverages{
 		Name:    constants.CrossingSimpleMovingAverage,
-		FastSma: indicators.NewSimpleMovingAverageFromMap(aux),
-		SlowSma: indicators.NewSimpleMovingAverageFromMap(parameters[slowSma].(map[string]interface{})),
+		FastSma: indicators.NewSimpleMovingAverageFromConfig(strategyConfig.GetParameter(fastSma)),
+		SlowSma: indicators.NewSimpleMovingAverageFromConfig(strategyConfig.GetParameter(slowSma)),
 	}
 }
 

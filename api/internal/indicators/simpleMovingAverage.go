@@ -17,12 +17,10 @@ const CloseSource MovingAverageSource = "close"
 
 const length = "length"
 
-func NewSimpleMovingAverageFromMap(parameters map[string]interface{}) *SimpleMovingAverage {
-	aux := int(parameters[length].(float64))
-
+func NewSimpleMovingAverageFromConfig(parameter *domain.Parameter) *SimpleMovingAverage {
 	return &SimpleMovingAverage{
 		Name:   constants.SimpleMovingAverage,
-		Length: aux,
+		Length: parameter.Value,
 		Source: CloseSource,
 	}
 }

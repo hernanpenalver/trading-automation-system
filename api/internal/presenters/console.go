@@ -13,10 +13,10 @@ func NewConsolePresenter() *ConsolePresenter {
 	return &ConsolePresenter{}
 }
 
-func (c *ConsolePresenter) Execute(strategyContext *strategies_context.StrategyContext, strategyResult []*domain.StrategyExecutorResult) {
+func (c *ConsolePresenter) Execute(strategy *domain.StrategyConfig, strategyContext *strategies_context.StrategyContext, strategyResult []*domain.StrategyExecutorResult) {
 	log.Print("=====================================")
 	log.Printf("Executing console_presenter")
-	log.Printf("Estrategia: %s", strategyContext.Strategy.GetName())
+	log.Printf("Estrategia: %s", strategy.Name)
 	log.Printf("From: %s / To: %s", strategyContext.DateFrom.String(), strategyContext.DateTo.String())
 
 	for _, s := range strategyResult {

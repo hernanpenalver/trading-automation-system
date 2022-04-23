@@ -14,18 +14,18 @@ func NewMetricPresenter() *MetricPresenter {
 	return &MetricPresenter{}
 }
 
-func (c *MetricPresenter) Execute(strategyContext *strategies_context.StrategyContext, strategyResult []*domain.StrategyExecutorResult) {
+func (c *MetricPresenter) Execute(strategy *domain.StrategyConfig, strategyContext *strategies_context.StrategyContext, strategyResult []*domain.StrategyExecutorResult) {
 	log.Print("Executing metric_presenter")
 
 	for _, s := range strategyResult {
-		c.execute(strategyContext, s)
+		c.execute(strategy, strategyContext, s)
 	}
 }
 
-func (c *MetricPresenter) execute(strategyContext *strategies_context.StrategyContext, strategyResult *domain.StrategyExecutorResult) {
+func (c *MetricPresenter) execute(strategy *domain.StrategyConfig, strategyContext *strategies_context.StrategyContext, strategyResult *domain.StrategyExecutorResult) {
 	investmentBalance := strategyResult.GetInvestmentBalance(strategyContext.Investment.Amount)
 	percentBalance := strategyResult.GetStrategyPercentBalance(strategyContext.Investment.Amount)
 
-	metrics.MetricStrategyResultByInvestment(strategyContext.Strategy.GetName(), investmentBalance)
-	metrics.MetricStrategyResultByPercentBalance(strategyContext.Strategy.GetName(), percentBalance)
+	metrics.MetricStrategyResultByInvestment(strategy.Name, investmentBalance)
+	metrics.MetricStrategyResultByPercentBalance(strategy.Name, percentBalance)
 }

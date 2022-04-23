@@ -6,7 +6,7 @@ import (
 )
 
 type ExecutionConfig struct {
-	Strategies []StrategyConfig    `json:"strategies"`
+	Strategies []*StrategyConfig   `json:"strategies"`
 	Investment InvestmentConfig    `json:"investment"`
 	DateFrom   string              `json:"date_from"`
 	DateTo     string              `json:"date_to"`
@@ -15,28 +15,28 @@ type ExecutionConfig struct {
 }
 
 type StrategyConfig struct {
-	Name       string                 `json:"name"`
-	Parameters map[string]interface{} `json:"parameters"`
+	Name       string       `json:"name"`
+	Parameters []*Parameter `json:"parameters"`
 }
 
-//type StrategyConfig struct {
-//	Name       string `json:"name"`
-//	Parameters struct {
-//		SlowSma struct {
-//			FixedLength int `json:"fixed_length"`
-//			MinLength   int `json:"min_length"`
-//			MaxLength   int `json:"max_length"`
-//		} `json:"slow_sma"`
-//		FastSma struct {
-//			FixedLength int `json:"fixed_length"`
-//			MinLength   int `json:"min_length"`
-//			MaxLength   int `json:"max_length"`
-//		} `json:"fast_sma"`
-//	} `json:"parameters"`
-//}
+type Parameter struct {
+	Name  string `json:"name"`
+	Value int    `json:"value"`
+	Min   int    `json:"min"`
+	Max   int    `json:"max"`
+}
 
 type InvestmentConfig struct {
 	InitialAmount float64 `json:"initial_amount"`
+}
+
+func (s *StrategyConfig) GetParameter(name string) *Parameter {
+	for _, parameter := range s.Parameters {
+		if parameter.Name == name {
+			return parameter
+		}
+	}
+	return nil
 }
 
 func (e *ExecutionConfig) GetDateFrom() *time.Time {
