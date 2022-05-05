@@ -3,13 +3,14 @@ package domain
 import "trading-automation-system/api/internal/utils"
 
 type Operation struct {
-	ID         string
-	Operation  Action
-	Amount     float64
-	EntryPrice float64
-	StopLoss   float64
-	TakeProfit float64
-	CloseData  *CloseData
+	ID             string
+	Operation      Action
+	Amount         float64
+	EntryPrice     float64
+	StopLoss       float64
+	TakeProfit     float64
+	CloseData      *CloseData
+	CloseCondition func(candleStickList []CandleStick) (bool, *CloseData)
 }
 
 type CloseData struct {
@@ -77,11 +78,11 @@ func (o *Operation) GetPercentNetBalance() float64 {
 	}
 
 	if o.IsBuy() {
-		return utils.GetPercentageOf(o.EntryPrice, (o.Amount * o.CloseData.Price) - (o.Amount * o.EntryPrice))
+		return utils.GetPercentageOf(o.EntryPrice, (o.Amount*o.CloseData.Price)-(o.Amount*o.EntryPrice))
 	}
 
 	if o.IsSell() {
-		return utils.GetPercentageOf(o.EntryPrice, (o.Amount * o.EntryPrice) - (o.Amount * o.CloseData.Price))
+		return utils.GetPercentageOf(o.EntryPrice, (o.Amount*o.EntryPrice)-(o.Amount*o.CloseData.Price))
 	}
 
 	return 0
@@ -98,8 +99,8 @@ const (
 type CloseReason string
 
 const (
-	StopLossReason          CloseReason = "stop_loss"
-	TakeProfitReason        CloseReason = "take_profit"
-	ForceCloseReason        CloseReason = "force_close"
-	StrategyConditionReason CloseReason = "strategy_condition"
+	StopLossReason       CloseReason = "stop_loss"
+	TakeProfitReason     CloseReason = "take_profit"
+	ForceCloseReason     CloseReason = "force_close"
+	CloseConditionReason CloseReason = "close_condition"
 )

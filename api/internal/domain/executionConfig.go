@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"time"
 	"trading-automation-system/api/internal/constants"
 )
@@ -11,7 +12,7 @@ type ExecutionConfig struct {
 	DateFrom   string              `json:"date_from"`
 	DateTo     string              `json:"date_to"`
 	Timeframe  constants.TimeFrame `json:"timeframe"`
-	Symbol     []constants.Symbol  `json:"symbol"`
+	Symbol     constants.Symbol    `json:"symbol"`
 }
 
 type StrategyConfig struct {
@@ -37,6 +38,14 @@ func (s *StrategyConfig) GetParameter(name string) *Parameter {
 		}
 	}
 	return nil
+}
+
+func (s *StrategyConfig) StringifyParams() string {
+	var stringifyParams string
+	for _, parameter := range s.Parameters {
+		stringifyParams += fmt.Sprintf("%s_%d", parameter.Name, parameter.Value)
+	}
+	return stringifyParams
 }
 
 func (e *ExecutionConfig) GetDateFrom() *time.Time {

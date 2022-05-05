@@ -1,4 +1,4 @@
-package clients
+package MarketManagers
 
 import (
 	"encoding/json"
@@ -7,21 +7,25 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"trading-automation-system/api/internal/constants"
 	"trading-automation-system/api/internal/domain"
 )
 
 type BinanceApi struct {
 }
 
-func (b *BinanceApi) Get(symbol string, interval string, dateFrom *time.Time, dateTo *time.Time) ([]domain.CandleStick, error) {
+func NewBinanceApi() *BinanceApi {
+	return &BinanceApi{}
+}
+
+func (b *BinanceApi) Get(symbol constants.Symbol, interval constants.TimeFrame, dateFrom *time.Time, dateTo *time.Time) ([]domain.CandleStick, error) {
 	uri := fmt.Sprintf("https://api.binance.com/api/v3/klines?symbol=%s&interval=%s", symbol, interval)
 
 	if dateFrom != nil && dateTo != nil {
 		dateFromMillis := dateFrom.UnixNano() / int64(time.Millisecond)
 		dateToMillis := dateTo.UnixNano() / int64(time.Millisecond)
 
-		timeInterval := fmt.Sprintf("&startTime=%d&endTime=%d", dateFromMillis, dateToMillis)
-		uri += timeInterval
+		uri += fmt.Sprintf("&startTime=%d&endTime=%d", dateFromMillis, dateToMillis)
 	}
 
 	response, err := http.Get(uri)
@@ -56,15 +60,29 @@ func (b *BinanceApi) ParseResponse(data []interface{}) domain.CandleStick {
 	max, _ := strconv.ParseFloat(data[2].(string), 64)
 	min, _ := strconv.ParseFloat(data[3].(string), 64)
 
-	openDateTime := time.Unix(0, int64(openTime) * int64(time.Millisecond))
+	openDateTime := time.Unix(0, int64(openTime)*int64(time.Millisecond))
 
 	return domain.CandleStick{
-		OpenTime:  openTime,
-		CloseTime: closeTime,
-		Close:     closePrice,
-		Open:      open,
-		Max:       max,
-		Min:       min,
+		OpenTime:     openTime,
+		CloseTime:    closeTime,
+		Close:        closePrice,
+		Open:         open,
+		Max:          max,
+		Min:          min,
 		OpenDateTime: openDateTime.String(),
 	}
+}
+
+func (b *BinanceApi) FullBuy(quantity, price, stopLoss, takeProfit float64) (*MarketOperation, error) {
+	return &MarketOperation{
+		Quantity:   quantity,
+		EntryPrice: price,
+	}, nil
+}
+
+func (b *BinanceApi) FullSell(quantity, price, stopLoss, takeProfit float64) (*MarketOperation, error) {
+	return &MarketOperation{
+		Quantity:   quantity,
+		EntryPrice: price,
+	}, nil
 }

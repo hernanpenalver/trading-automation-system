@@ -7,5 +7,4 @@ import (
 type StrategyInterface interface {
 	GetName() string
 	GetOperation([]domain.CandleStick) *domain.Operation
-	NextConfigurations() bool
 }

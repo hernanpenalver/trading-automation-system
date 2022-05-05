@@ -1,7 +1,6 @@
 package strategies
 
 import (
-	"fmt"
 	"github.com/google/uuid"
 	"trading-automation-system/api/internal/constants"
 	"trading-automation-system/api/internal/domain"
@@ -40,19 +39,6 @@ func (c *CrossingSimpleMovingAverages) GetName() string {
 	return c.Name
 }
 
-func (c *CrossingSimpleMovingAverages) InitDefaultValues() {
-	if c.FastSma == nil {
-		c.FastSma = &indicators.SimpleMovingAverage{}
-	}
-
-	if c.SlowSma == nil {
-		c.SlowSma = &indicators.SimpleMovingAverage{}
-	}
-
-	c.FastSma.Length = 5
-	c.SlowSma.Length = 10
-}
-
 func (c *CrossingSimpleMovingAverages) GetOperation(candleStickList []domain.CandleStick) *domain.Operation {
 
 	slowSmaCollection := c.SlowSma.Calculate(candleStickList)
@@ -66,8 +52,21 @@ func (c *CrossingSimpleMovingAverages) GetOperation(candleStickList []domain.Can
 			Operation:  domain.BuyAction,
 			EntryPrice: entryPrice,
 			Amount:     1,
-			TakeProfit: utils.PlusPercentage(entryPrice, 10),
-			StopLoss:   utils.MinusPercentage(entryPrice, 5),
+			TakeProfit: utils.PlusPercentage(entryPrice, 2),
+			StopLoss:   utils.MinusPercentage(entryPrice, 1),
+			CloseCondition: func(candleStickList []domain.CandleStick) (bool, *domain.CloseData) {
+				slowSmaResult := c.SlowSma.Calculate(candleStickList)
+				fastSmaResult := c.FastSma.Calculate(candleStickList)
+
+				if series.CrossUnder(fastSmaResult, slowSmaResult) {
+					lastPrice := candleStickList[len(candleStickList)-1].Close
+					return true, &domain.CloseData{
+						Price:  lastPrice,
+						Reason: domain.CloseConditionReason,
+					}
+				}
+				return false, nil
+			},
 		}
 	}
 
@@ -79,36 +78,23 @@ func (c *CrossingSimpleMovingAverages) GetOperation(candleStickList []domain.Can
 			Operation:  domain.SellAction,
 			EntryPrice: entryPrice,
 			Amount:     1,
-			TakeProfit: utils.MinusPercentage(entryPrice, 10),
-			StopLoss:   utils.PlusPercentage(entryPrice, 5),
+			TakeProfit: utils.MinusPercentage(entryPrice, 2),
+			StopLoss:   utils.PlusPercentage(entryPrice, 1),
+			CloseCondition: func(candleStickList []domain.CandleStick) (bool, *domain.CloseData) {
+				slowSmaResult := c.SlowSma.Calculate(candleStickList)
+				fastSmaResult := c.FastSma.Calculate(candleStickList)
+
+				if series.CrossOver(fastSmaResult, slowSmaResult) {
+					lastPrice := candleStickList[len(candleStickList)-1].Close
+					return true, &domain.CloseData{
+						Price:  lastPrice,
+						Reason: domain.CloseConditionReason,
+					}
+				}
+				return false, nil
+			},
 		}
 	}
 
 	return nil
 }
-
-func (c *CrossingSimpleMovingAverages) NextConfigurations() bool {
-	if !c.FastSma.SetNextConfiguration() {
-		c.FastSma.Length = 1
-		if !c.SlowSma.SetNextConfiguration() {
-			return false
-		}
-	}
-
-	fmt.Printf("slowSma: %d, fastSma: %d\n", c.SlowSma.Length, c.FastSma.Length)
-	return true
-}
-
-//func (c *CrossingSimpleMovingAverages) GetNextConfiguration() *CrossingSimpleMovingAverages {
-//	newFastSma := c.FastSma.GetNextConfiguration()
-//	newSlowSma := c.SlowSma
-//	if newFastSma == nil {
-//		c.FastSma.Length = 1
-//		newSlowSma = c.SlowSma.GetNextConfiguration()
-//		if newSlowSma == nil {
-//			return nil
-//		}
-//	}
-//
-//	return NewCrossingSimpleMovingAverages(newFastSma, newSlowSma)
-//}

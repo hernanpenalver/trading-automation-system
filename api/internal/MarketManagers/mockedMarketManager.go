@@ -5,14 +5,13 @@ import (
 	"io/ioutil"
 	"os"
 	"time"
-	"trading-automation-system/api/internal/MarketManagers/clients"
 	"trading-automation-system/api/internal/constants"
 	"trading-automation-system/api/internal/domain"
 )
 
 type MockedMarketManager struct{}
 
-func (m *MockedMarketManager) Get(dateFrom, dateTo *time.Time, timeFrame constants.TimeFrame) ([]domain.CandleStick, error) {
+func (m *MockedMarketManager) Get(symbol constants.Symbol, interval constants.TimeFrame, dateFrom, dateTo *time.Time) ([]domain.CandleStick, error) {
 	jsonFile, err := os.Open("./api/internal/mocks/historical_BTCUSDT_1h.json")
 	// if we os.Open returns an error then handle it
 	if err != nil {
@@ -27,7 +26,7 @@ func (m *MockedMarketManager) Get(dateFrom, dateTo *time.Time, timeFrame constan
 		return nil, err
 	}
 
-	binanceClient := clients.BinanceApi{}
+	binanceClient := BinanceApi{}
 
 	var candleStickCollection []domain.CandleStick
 	for _, r := range data {

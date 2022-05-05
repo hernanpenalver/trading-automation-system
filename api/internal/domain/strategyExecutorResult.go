@@ -10,6 +10,17 @@ type StrategyExecutorResult struct {
 	OpenedOperations    []*Operation
 }
 
+func (s *StrategyExecutorResult) GetQuantityOperationsClosedBy(reason CloseReason) int {
+	var quantity int
+	for _, o := range s.ClosedOperations {
+		if o.CloseData.Reason == reason {
+			quantity += 1
+		}
+	}
+
+	return quantity
+}
+
 func (s *StrategyExecutorResult) GetCompleteBalance() float64 {
 	var completeBalance float64
 

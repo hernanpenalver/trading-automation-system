@@ -17,7 +17,7 @@ func NewDefaultStrategyExecutor(marketManager MarketManagers.MarketManagerInterf
 }
 
 func (d *DefaultStrategyExecutor) Run(strategy strategies.StrategyInterface, strContext *strategies_context.StrategyContext) (*domain.StrategyExecutorResult, error) {
-	candleStickList, err := d.marketManager.Get(strContext.DateFrom, strContext.DateTo, strContext.TimeFrame)
+	candleStickList, err := d.marketManager.Get(strContext.Symbol, strContext.TimeFrame, strContext.DateFrom, strContext.DateTo)
 	if err != nil {
 		return nil, err
 	}
@@ -46,32 +46,32 @@ func (d *DefaultStrategyExecutor) Run(strategy strategies.StrategyInterface, str
 			if marketOperation != nil {
 				openedOperations = append(openedOperations, operation)
 			}
+		}
 
-			var idsClosed []string
-			for _, o := range openedOperations {
-				if o.HaveToTakeProfit(&candleStickList[i]) {
-					o.CloseData = &domain.CloseData{
-						Price:  o.TakeProfit,
-						Reason: domain.TakeProfitReason,
-					}
+		var idsClosed []string
+		for _, o := range openedOperations {
+			if ok, closeData := o.CloseCondition(candleStickList[0:i]); ok {
+				o.CloseData = closeData
 
-					idsClosed = append(idsClosed, o.ID)
-					closedOperations = append(closedOperations, o)
-				} else if o.HaveToStopLoss(&candleStickList[i]) {
-					o.CloseData = &domain.CloseData{
-						Price:  o.StopLoss,
-						Reason: domain.StopLossReason,
-					}
-
-					idsClosed = append(idsClosed, o.ID)
-					closedOperations = append(closedOperations, o)
-				}
+				idsClosed = append(idsClosed, o.ID)
+				closedOperations = append(closedOperations, o)
 			}
 
-			for _, ID := range idsClosed {
-				openedOperations = series.RemoveOrderedByID(openedOperations, ID)
+			if o.HaveToStopLoss(&candleStickList[i]) {
+				o.CloseData = &domain.CloseData{
+					Price:  o.StopLoss,
+					Reason: domain.StopLossReason,
+				}
+
+				idsClosed = append(idsClosed, o.ID)
+				closedOperations = append(closedOperations, o)
 			}
 		}
+
+		for _, ID := range idsClosed {
+			openedOperations = series.RemoveOrderedByID(openedOperations, ID)
+		}
+
 	}
 
 	for _, o := range openedOperations {

@@ -7,7 +7,7 @@ import (
 )
 
 type MarketManagerInterface interface {
-	Get(dateFrom, dateTo *time.Time, timeFrame constants.TimeFrame) ([]domain.CandleStick, error)
+	Get(symbol constants.Symbol, timeframe constants.TimeFrame, dateFrom, dateTo *time.Time) ([]domain.CandleStick, error)
 	FullBuy(quantity, price, stopLoss, takeProfit float64) (*MarketOperation, error)
 	FullSell(quantity, price, stopLoss, takeProfit float64) (*MarketOperation, error)
 }

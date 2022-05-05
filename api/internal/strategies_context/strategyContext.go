@@ -11,9 +11,10 @@ type StrategyContext struct {
 	TimeFrame  constants.TimeFrame
 	DateFrom   *time.Time
 	DateTo     *time.Time
+	Symbol     constants.Symbol
 }
 
-func NewStrategyContext(initialAmount float64, timeFrame constants.TimeFrame, dateFrom *time.Time, dateTo *time.Time) *StrategyContext {
+func NewStrategyContext(symbol constants.Symbol, initialAmount float64, timeFrame constants.TimeFrame, dateFrom *time.Time, dateTo *time.Time) *StrategyContext {
 	return &StrategyContext{
 		Investment: &domain.Investment{
 			Amount: initialAmount,
@@ -21,5 +22,6 @@ func NewStrategyContext(initialAmount float64, timeFrame constants.TimeFrame, da
 		TimeFrame: timeFrame,
 		DateFrom:  dateFrom,
 		DateTo:    dateTo,
+		Symbol:    symbol,
 	}
 }

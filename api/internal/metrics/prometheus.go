@@ -1,7 +1,6 @@
 package metrics
 
 import (
-	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -17,22 +16,18 @@ var StrategiesResultsByInvestment = prometheus.NewGaugeVec(
 	prometheus.GaugeOpts{
 		Name: "strategies_results_by_investment",
 		Help: "Result of strategy execution",
-	},
-	[]string{"strategy", "investment_balance"})
+	}, []string{"strategy", "parameters"})
 
 var StrategiesResultsByPercentBalance = prometheus.NewGaugeVec(
 	prometheus.GaugeOpts{
 		Name: "strategies_results_by_percent_balance",
 		Help: "Result of strategy execution",
-	},
-	[]string{"strategy", "percent_balance"})
+	}, []string{"strategy", "parameters"})
 
-func MetricStrategyResultByInvestment(strategyName string, investmentBalance float64) {
-	investmentBalanceString := fmt.Sprintf("%f", investmentBalance)
-	StrategiesResultsByInvestment.WithLabelValues(strategyName, investmentBalanceString).Set(investmentBalance)
+func MetricStrategyResultByInvestment(strategyName string, parameters string, investmentBalance float64) {
+	StrategiesResultsByInvestment.WithLabelValues(strategyName, parameters).Set(investmentBalance)
 }
 
-func MetricStrategyResultByPercentBalance(strategyName string, balance float64) {
-	balanceString := fmt.Sprintf("%f", balance)
-	StrategiesResultsByPercentBalance.WithLabelValues(strategyName, balanceString).Set(balance)
+func MetricStrategyResultByPercentBalance(strategyName string, parameters string, balance float64) {
+	StrategiesResultsByPercentBalance.WithLabelValues(strategyName, parameters).Set(balance)
 }

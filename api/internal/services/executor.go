@@ -20,28 +20,25 @@ func NewGenericExecutor(strategyExecutor executors.StrategyExecutorInterface) *G
 func (e *GenericExecutor) Execute(config domain.ExecutionConfig) error {
 	consolePresenter := presenters.NewConsolePresenter()
 	metricPresenter := presenters.NewMetricPresenter()
-	strategyContext := strategies_context.NewStrategyContext(config.Investment.InitialAmount, config.Timeframe, config.GetDateFrom(), config.GetDateTo())
+	strategyContext := strategies_context.NewStrategyContext(config.Symbol, config.Investment.InitialAmount, config.Timeframe, config.GetDateFrom(), config.GetDateTo())
 
 	for _, s := range config.Strategies {
-		var results []*domain.StrategyExecutorResult
-
 		//Ejecucion con parametros de entrada
 		defaultExecutorResult := e.execute(s, strategyContext)
-		results = append(results, defaultExecutorResult)
+		consolePresenter.Execute(s, strategyContext, defaultExecutorResult)
+		metricPresenter.Execute(s, strategyContext, defaultExecutorResult)
 
 		for {
 			if ok, parameters := getNextConfiguration(s.Parameters); ok {
 				s.Parameters = parameters
 
 				defaultExecutorResult := e.execute(s, strategyContext)
-				results = append(results, defaultExecutorResult)
+				consolePresenter.Execute(s, strategyContext, defaultExecutorResult)
+				//metricPresenter.Execute(s, strategyContext, defaultExecutorResult)
 			} else {
 				break
 			}
 		}
-
-		consolePresenter.Execute(s, strategyContext, results)
-		metricPresenter.Execute(s, strategyContext, results)
 	}
 
 	return nil
