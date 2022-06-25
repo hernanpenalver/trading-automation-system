@@ -1,6 +1,9 @@
 package domain
 
-import "trading-automation-system/api/internal/utils"
+import (
+	"time"
+	"trading-automation-system/api/internal/utils/maths"
+)
 
 type Operation struct {
 	ID             string
@@ -11,11 +14,16 @@ type Operation struct {
 	TakeProfit     float64
 	CloseData      *CloseData
 	CloseCondition func(candleStickList []CandleStick) (bool, *CloseData)
+	EntryDate      int64
 }
 
 type CloseData struct {
 	Price  float64
 	Reason CloseReason
+}
+
+func (o *Operation) GetEntryDate() time.Time {
+	return time.Unix(0, o.EntryDate*int64(time.Millisecond))
 }
 
 func (o *Operation) IsBuy() bool {
@@ -78,11 +86,11 @@ func (o *Operation) GetPercentNetBalance() float64 {
 	}
 
 	if o.IsBuy() {
-		return utils.GetPercentageOf(o.EntryPrice, (o.Amount*o.CloseData.Price)-(o.Amount*o.EntryPrice))
+		return maths.GetPercentageOf(o.EntryPrice, (o.Amount*o.CloseData.Price)-(o.Amount*o.EntryPrice))
 	}
 
 	if o.IsSell() {
-		return utils.GetPercentageOf(o.EntryPrice, (o.Amount*o.EntryPrice)-(o.Amount*o.CloseData.Price))
+		return maths.GetPercentageOf(o.EntryPrice, (o.Amount*o.EntryPrice)-(o.Amount*o.CloseData.Price))
 	}
 
 	return 0

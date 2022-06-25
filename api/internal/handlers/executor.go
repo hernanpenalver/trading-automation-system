@@ -23,7 +23,7 @@ func (e *GenericExecutor) Execute(c *gin.Context) {
 		return
 	}
 
-	err = e.executor.Execute(executionConfig)
+	_, err = e.executor.Execute(executionConfig)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return

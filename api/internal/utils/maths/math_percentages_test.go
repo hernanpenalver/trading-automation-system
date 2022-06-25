@@ -1,4 +1,4 @@
-package utils
+package maths
 
 import (
 	"github.com/stretchr/testify/assert"

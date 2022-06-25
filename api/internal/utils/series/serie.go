@@ -1,6 +1,8 @@
 package series
 
-import "trading-automation-system/api/internal/domain"
+import (
+	"trading-automation-system/api/internal/domain"
+)
 
 func CrossOver(serieA []float64, serieB []float64) bool {
 	length := 4
@@ -10,6 +12,8 @@ func CrossOver(serieA []float64, serieB []float64) bool {
 	if len(serieA) < length || len(serieB) < length {
 		return crossover
 	}
+
+	//fmt.Print("\n", "serieA: ", serieA[seriesQty-4:seriesQty], "\n", "serieB: ", serieB[seriesQty-4:seriesQty])
 
 	if serieA[seriesQty-length] < serieB[seriesQty-length] &&
 		serieA[seriesQty-(length-1)] < serieB[seriesQty-(length-1)] &&

@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"trading-automation-system/api/internal/utils"
+	"trading-automation-system/api/internal/utils/maths"
 )
 
 type StrategyExecutorResult struct {
@@ -72,14 +72,17 @@ func (s *StrategyExecutorResult) GetStrategyPercentBalance(investmentAmount floa
 		investmentAmount = 100
 	}
 
-	return utils.GetPercentageOf(investmentAmount, s.GetInvestmentBalance(investmentAmount)) - 100
+	return maths.GetPercentageOf(investmentAmount, s.GetInvestmentBalance(investmentAmount)) - 100
 }
 
 func (s *StrategyExecutorResult) GetInvestmentBalance(investmentAmount float64) float64 {
 	for _, co := range s.ClosedOperations {
-		if co.CloseData.Reason == TakeProfitReason || co.CloseData.Reason == StopLossReason {
+		if co.CloseData.Reason == TakeProfitReason ||
+			co.CloseData.Reason == StopLossReason ||
+			co.CloseData.Reason == CloseConditionReason {
+
 			percent := co.GetPercentNetBalance()
-			investmentAmount = utils.PlusPercentage(investmentAmount, percent)
+			investmentAmount = maths.PlusPercentage(investmentAmount, percent)
 		}
 	}
 

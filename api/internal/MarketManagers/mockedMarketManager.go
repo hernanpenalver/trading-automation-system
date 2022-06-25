@@ -12,7 +12,7 @@ import (
 type MockedMarketManager struct{}
 
 func (m *MockedMarketManager) Get(symbol constants.Symbol, interval constants.TimeFrame, dateFrom, dateTo *time.Time) ([]domain.CandleStick, error) {
-	jsonFile, err := os.Open("./api/internal/mocks/historical_BTCUSDT_1h.json")
+	jsonFile, err := os.Open("./api/internal/mocks/historical_BTCUSDT_5m_phenomenon.json")
 	// if we os.Open returns an error then handle it
 	if err != nil {
 		return nil, err

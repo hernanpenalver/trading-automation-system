@@ -5,7 +5,7 @@ import (
 	"trading-automation-system/api/internal/constants"
 	"trading-automation-system/api/internal/domain"
 	"trading-automation-system/api/internal/indicators"
-	"trading-automation-system/api/internal/utils"
+	"trading-automation-system/api/internal/utils/maths"
 	"trading-automation-system/api/internal/utils/series"
 )
 
@@ -27,14 +27,6 @@ func NewCrossingSimpleMovingAveragesFromConfig(strategyConfig *domain.StrategyCo
 	}
 }
 
-func NewCrossingSimpleMovingAverages(fastSma *indicators.SimpleMovingAverage, slowSma *indicators.SimpleMovingAverage) *CrossingSimpleMovingAverages {
-	return &CrossingSimpleMovingAverages{
-		Name:    "Crossing Simple Moving Average",
-		FastSma: fastSma,
-		SlowSma: slowSma,
-	}
-}
-
 func (c *CrossingSimpleMovingAverages) GetName() string {
 	return c.Name
 }
@@ -52,8 +44,8 @@ func (c *CrossingSimpleMovingAverages) GetOperation(candleStickList []domain.Can
 			Operation:  domain.BuyAction,
 			EntryPrice: entryPrice,
 			Amount:     1,
-			TakeProfit: utils.PlusPercentage(entryPrice, 2),
-			StopLoss:   utils.MinusPercentage(entryPrice, 1),
+			TakeProfit: maths.PlusPercentage(entryPrice, 2),
+			StopLoss:   maths.MinusPercentage(entryPrice, 1),
 			CloseCondition: func(candleStickList []domain.CandleStick) (bool, *domain.CloseData) {
 				slowSmaResult := c.SlowSma.Calculate(candleStickList)
 				fastSmaResult := c.FastSma.Calculate(candleStickList)
@@ -78,8 +70,8 @@ func (c *CrossingSimpleMovingAverages) GetOperation(candleStickList []domain.Can
 			Operation:  domain.SellAction,
 			EntryPrice: entryPrice,
 			Amount:     1,
-			TakeProfit: utils.MinusPercentage(entryPrice, 2),
-			StopLoss:   utils.PlusPercentage(entryPrice, 1),
+			TakeProfit: maths.MinusPercentage(entryPrice, 2),
+			StopLoss:   maths.PlusPercentage(entryPrice, 1),
 			CloseCondition: func(candleStickList []domain.CandleStick) (bool, *domain.CloseData) {
 				slowSmaResult := c.SlowSma.Calculate(candleStickList)
 				fastSmaResult := c.FastSma.Calculate(candleStickList)

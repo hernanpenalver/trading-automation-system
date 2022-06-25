@@ -9,6 +9,9 @@ var StrategyRepository = map[string]func(b *domain.StrategyConfig) StrategyInter
 	constants.CrossingSimpleMovingAverage: func(b *domain.StrategyConfig) StrategyInterface {
 		return NewCrossingSimpleMovingAveragesFromConfig(b)
 	},
+	constants.LowrySystem: func(b *domain.StrategyConfig) StrategyInterface {
+		return NewLowrySystemFromConfig(b)
+	},
 }
 
 func GetStrategyRepository(strategyConfig *domain.StrategyConfig) StrategyInterface {

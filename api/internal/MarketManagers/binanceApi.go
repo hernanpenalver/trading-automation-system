@@ -18,8 +18,30 @@ func NewBinanceApi() *BinanceApi {
 	return &BinanceApi{}
 }
 
+const limit = 1000
+
 func (b *BinanceApi) Get(symbol constants.Symbol, interval constants.TimeFrame, dateFrom *time.Time, dateTo *time.Time) ([]domain.CandleStick, error) {
-	uri := fmt.Sprintf("https://api.binance.com/api/v3/klines?symbol=%s&interval=%s", symbol, interval)
+	var candleStickList []domain.CandleStick
+
+	for dateFrom.Before(*dateTo) {
+		aux, err := b.get(symbol, interval, dateFrom, dateTo)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(aux) > 0 {
+			candleStickList = append(candleStickList, aux...)
+		}
+
+		closeDateTime := time.Unix(0, int64(aux[len(aux)-1].CloseTime)*int64(time.Millisecond))
+		dateFrom = &closeDateTime
+	}
+
+	return candleStickList, nil
+}
+
+func (b *BinanceApi) get(symbol constants.Symbol, interval constants.TimeFrame, dateFrom *time.Time, dateTo *time.Time) ([]domain.CandleStick, error) {
+	uri := fmt.Sprintf("https://api.binance.com/api/v3/klines?symbol=%s&interval=%s&limit=%d", symbol, interval, limit)
 
 	if dateFrom != nil && dateTo != nil {
 		dateFromMillis := dateFrom.UnixNano() / int64(time.Millisecond)
@@ -63,8 +85,8 @@ func (b *BinanceApi) ParseResponse(data []interface{}) domain.CandleStick {
 	openDateTime := time.Unix(0, int64(openTime)*int64(time.Millisecond))
 
 	return domain.CandleStick{
-		OpenTime:     openTime,
-		CloseTime:    closeTime,
+		OpenTime:     int64(openTime),
+		CloseTime:    int64(closeTime),
 		Close:        closePrice,
 		Open:         open,
 		Max:          max,

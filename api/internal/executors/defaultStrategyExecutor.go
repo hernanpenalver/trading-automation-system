@@ -17,14 +17,15 @@ func NewDefaultStrategyExecutor(marketManager MarketManagers.MarketManagerInterf
 }
 
 func (d *DefaultStrategyExecutor) Run(strategy strategies.StrategyInterface, strContext *strategies_context.StrategyContext) (*domain.StrategyExecutorResult, error) {
+	var potentialOperations []*domain.Operation
+	var closedOperations []*domain.Operation
+	var openedOperations []*domain.Operation
+
 	candleStickList, err := d.marketManager.Get(strContext.Symbol, strContext.TimeFrame, strContext.DateFrom, strContext.DateTo)
 	if err != nil {
 		return nil, err
 	}
 
-	var potentialOperations []*domain.Operation
-	var closedOperations []*domain.Operation
-	var openedOperations []*domain.Operation
 	for i := range candleStickList {
 		operation := strategy.GetOperation(candleStickList[0:i])
 
