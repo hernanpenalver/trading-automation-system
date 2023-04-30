@@ -1,0 +1,9 @@
+s is Git's per-user configuration file.
+[user]
+# Please adapt and uncomment the following lines:
+        name = hernanpenalver
+        email = hernan.l.penalver@gmail.com
+
+
+#[url "ssh://git@github.com/"]
+# insteadOf = https://github.com/
