@@ -4,7 +4,6 @@ import (
 	"trading-automation-system/api/internal/MarketManagers"
 	"trading-automation-system/api/internal/domain"
 	"trading-automation-system/api/internal/strategies"
-	"trading-automation-system/api/internal/strategies_context"
 	"trading-automation-system/api/internal/utils/series"
 )
 
@@ -16,7 +15,7 @@ func NewDefaultStrategyExecutor(marketManager MarketManagers.MarketManagerInterf
 	return &DefaultStrategyExecutor{marketManager: marketManager}
 }
 
-func (d *DefaultStrategyExecutor) Run(strategy strategies.StrategyInterface, strContext *strategies_context.StrategyContext) (*domain.StrategyExecutorResult, error) {
+func (d *DefaultStrategyExecutor) Run(strategy strategies.StrategyInterface, strContext *Context) (*domain.StrategyExecutorResult, error) {
 	var potentialOperations []*domain.Operation
 	var closedOperations []*domain.Operation
 	var openedOperations []*domain.Operation

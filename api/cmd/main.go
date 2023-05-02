@@ -36,7 +36,7 @@ func main() {
 	router := gin.New()
 
 	router.GET("/ping", handlers.Ping)
-	router.POST("/execute", genericExecutor.Execute)
+	router.POST("/backtest/execute", genericExecutor.Execute)
 	router.GET("/prometheus", prometheusHandler())
 
 	fmt.Println("Serving requests on port 9000")

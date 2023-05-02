@@ -1,33 +1,31 @@
 package indicators
 
 import (
-	"trading-automation-system/api/internal/constants"
 	"trading-automation-system/api/internal/domain"
+)
+
+const (
+	SimpleMovingAverageName = "simple_moving_average"
+	CloseSource             = "close"
 )
 
 type SimpleMovingAverage struct {
 	Name   string
 	Length int
-	Source MovingAverageSource
+	Source string
 }
 
-type MovingAverageSource string
+//func NewSimpleMovingAverageFromConfig(parameter *strategies.Parameter) *SimpleMovingAverage {
+//	return &SimpleMovingAverage{
+//		Name:   SimpleMovingAverageName,
+//		Length: parameter.Value,
+//		Source: CloseSource,
+//	}
+//}
 
-const CloseSource MovingAverageSource = "close"
-
-const length = "length"
-
-func NewSimpleMovingAverageFromConfig(parameter *domain.Parameter) *SimpleMovingAverage {
+func NewSimpleMovingAverage(length int, source string) *SimpleMovingAverage {
 	return &SimpleMovingAverage{
-		Name:   constants.SimpleMovingAverage,
-		Length: parameter.Value,
-		Source: CloseSource,
-	}
-}
-
-func NewSimpleMovingAverage(length int, source MovingAverageSource) *SimpleMovingAverage {
-	return &SimpleMovingAverage{
-		Name:   "Simple Moving Average",
+		Name:   SimpleMovingAverageName,
 		Length: length,
 		Source: source,
 	}

@@ -4,56 +4,65 @@ import (
 	"log"
 	"trading-automation-system/api/internal/domain"
 	"trading-automation-system/api/internal/executors"
-	"trading-automation-system/api/internal/presenters"
+	presenters2 "trading-automation-system/api/internal/presenters"
 	"trading-automation-system/api/internal/strategies"
 	"trading-automation-system/api/internal/strategies_context"
 )
 
 type GenericExecutor struct {
-	strategyExecutor executors.StrategyExecutorInterface
+	backtestStrategyExecutor executors.StrategyExecutorInterface
 }
 
 func NewGenericExecutor(strategyExecutor executors.StrategyExecutorInterface) *GenericExecutor {
-	return &GenericExecutor{strategyExecutor: strategyExecutor}
+	return &GenericExecutor{backtestStrategyExecutor: strategyExecutor}
 }
 
 func (e *GenericExecutor) Execute(config domain.ExecutionConfig) (*domain.StrategyExecutorResult, error) {
-	consolePresenter := presenters.NewConsolePresenter()
-	metricPresenter := presenters.NewMetricPresenter()
-	strategyContext := strategies_context.NewStrategyContext(config.Symbol, config.Investment.InitialAmount, config.Timeframe, config.GetDateFrom(), config.GetDateTo())
 
 	var defaultExecutorResult *domain.StrategyExecutorResult
-	for _, s := range config.Strategies {
+	for _, strategyConfig := range config.Strategies {
 		//Ejecucion con parametros de entrada
-		defaultExecutorResult = e.execute(s, strategyContext)
-		consolePresenter.Execute(s, strategyContext, defaultExecutorResult)
-		metricPresenter.Execute(s, strategyContext, defaultExecutorResult)
+		executorContext := executors.NewContext(config.Symbol, config.Investment.InitialAmount, config.Timeframe, config.GetDateFrom(), config.GetDateTo())
+		defaultExecutorResult = e.execute(&strategyConfig, executorContext)
 
-		for {
-			if ok, parameters := getNextConfiguration(s.Parameters); ok {
-				s.Parameters = parameters
+		strategyContext := strategies_context.NewStrategyContext(config.Symbol, config.Investment.InitialAmount, config.Timeframe, config.GetDateFrom(), config.GetDateTo())
+		logResults(config.Presenters, &strategyConfig, strategyContext, defaultExecutorResult)
 
-				defaultExecutorResult := e.execute(s, strategyContext)
-				consolePresenter.Execute(s, strategyContext, defaultExecutorResult)
-				//metricPresenter.Execute(s, strategyContext, defaultExecutorResult)
-			} else {
-				break
-			}
-		}
+		//for {
+		//	if ok, parameters := getNextConfiguration(strategyConfig.Parameters); ok {
+		//		strategyConfig.Parameters = parameters
+		//
+		//		defaultExecutorResult := e.execute(&strategyConfig, executorContext)
+		//		logResults(config.Presenters, &strategyConfig, strategyContext, defaultExecutorResult)
+		//	} else {
+		//		break
+		//	}
+		//}
 	}
 
 	return defaultExecutorResult, nil
 }
 
-func (e *GenericExecutor) execute(strategyConfig *domain.StrategyConfig, strategyContext *strategies_context.StrategyContext) *domain.StrategyExecutorResult {
-	log.Print(strategyConfig.Parameters[0].Value, " + ", strategyConfig.Parameters[1].Value)
-	strategy := strategies.GetStrategyRepository(strategyConfig)
-	defaultExecutorResult, err := e.strategyExecutor.Run(strategy, strategyContext)
+func (e *GenericExecutor) execute(strategyConfig *domain.StrategyConfig, strategyContext *executors.Context) *domain.StrategyExecutorResult {
+	//log.Print(strategyConfig.Parameters[0].Value, " + ", strategyConfig.Parameters[1].Value)
+	strategy := strategies.GetStrategyRepository(mapToExecutorContext(strategyConfig))
+	defaultExecutorResult, err := e.backtestStrategyExecutor.Run(strategy, strategyContext)
 	if err != nil {
 		log.Print("GenericExecutor.execute - error executing strategy: ", err)
 	}
 
 	return defaultExecutorResult
+}
+
+func mapToExecutorContext(strategyConfig *domain.StrategyConfig) *strategies.Context {
+	var strategyContextParameters []strategies.Parameter
+	for _, parameter := range strategyConfig.Parameters {
+		strategyContextParameters = append(strategyContextParameters, strategies.Parameter(parameter))
+	}
+	return &strategies.Context{
+		Name:       strategyConfig.Name,
+		Parameters: strategyContextParameters,
+	}
 }
 
 func getNextConfiguration(parameters []*domain.Parameter) (bool, []*domain.Parameter) {
@@ -73,4 +82,11 @@ func getNextConfiguration(parameters []*domain.Parameter) (bool, []*domain.Param
 	}
 
 	return false, parameters
+}
+
+func logResults(presenters []domain.PresentersConfig, strategy *domain.StrategyConfig, strategyContext *strategies_context.StrategyContext, strategyResult *domain.StrategyExecutorResult) {
+	for _, presenterConfig := range presenters {
+		presenter := presenters2.GetPresenterByName(presenterConfig.Name)
+		presenter.Execute(strategy, strategyContext, strategyResult)
+	}
 }

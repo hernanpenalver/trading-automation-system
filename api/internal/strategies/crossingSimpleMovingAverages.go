@@ -2,7 +2,6 @@ package strategies
 
 import (
 	"github.com/google/uuid"
-	"trading-automation-system/api/internal/constants"
 	"trading-automation-system/api/internal/domain"
 	"trading-automation-system/api/internal/indicators"
 	"trading-automation-system/api/internal/utils/maths"
@@ -15,15 +14,21 @@ type CrossingSimpleMovingAverages struct {
 	SlowSma *indicators.SimpleMovingAverage
 }
 
-const slowSma = "slow_sma"
-const fastSma = "fast_sma"
+const slowSmaLength = "slow_sma_length"
+const slowSmaSource = "slow_sma_source"
+const fastSmaLength = "fast_sma_length"
+const fastSmaSource = "fast_sma_source"
 
-func NewCrossingSimpleMovingAveragesFromConfig(strategyConfig *domain.StrategyConfig) *CrossingSimpleMovingAverages {
+func NewCrossingSimpleMovingAveragesFromContext(strategyContext *Context) *CrossingSimpleMovingAverages {
 
 	return &CrossingSimpleMovingAverages{
-		Name:    constants.CrossingSimpleMovingAverage,
-		FastSma: indicators.NewSimpleMovingAverageFromConfig(strategyConfig.GetParameter(fastSma)),
-		SlowSma: indicators.NewSimpleMovingAverageFromConfig(strategyConfig.GetParameter(slowSma)),
+		Name: CrossingSimpleMovingAverageName,
+		FastSma: indicators.NewSimpleMovingAverage(
+			strategyContext.GetParameter(fastSmaLength).GetIntValue(),
+			strategyContext.GetParameter(fastSmaSource).GetStringValue()),
+		SlowSma: indicators.NewSimpleMovingAverage(
+			strategyContext.GetParameter(slowSmaLength).GetIntValue(),
+			strategyContext.GetParameter(slowSmaSource).GetStringValue()),
 	}
 }
 
