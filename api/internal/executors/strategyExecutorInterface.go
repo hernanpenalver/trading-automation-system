@@ -6,5 +6,5 @@ import (
 )
 
 type StrategyExecutorInterface interface {
-	Run(strategies.StrategyInterface, *Context) (*domain.StrategyExecutorResult, error)
+	Run(strategies.StrategyInterface, []domain.CandleStick) (*StrategyExecutorResult, error)
 }

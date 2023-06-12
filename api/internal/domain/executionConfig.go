@@ -35,19 +35,19 @@ type PresentersConfig struct {
 	Name string `json:"name"`
 }
 
-func (s *StrategyConfig) GetParameter(name string) *Parameter {
-	for _, parameter := range s.Parameters {
-		if parameter.Name == name {
-			return parameter
-		}
-	}
-	return nil
-}
+//func (s *StrategyConfig) GetParameter(name string) *Parameter {
+//	for _, parameter := range s.Parameters {
+//		if parameter.Name == name {
+//			return parameter
+//		}
+//	}
+//	return nil
+//}
 
 func (s *StrategyConfig) StringifyParams() string {
 	var stringifyParams string
 	for _, parameter := range s.Parameters {
-		stringifyParams += fmt.Sprintf("%s_%d", parameter.Name, parameter.Value)
+		stringifyParams += fmt.Sprintf("%s_%v", parameter.Name, parameter.Data)
 	}
 	return stringifyParams
 }

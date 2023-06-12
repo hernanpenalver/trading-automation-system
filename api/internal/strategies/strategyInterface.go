@@ -6,5 +6,7 @@ import (
 
 type StrategyInterface interface {
 	GetName() string
+	SetParameters(*Context)
+	ToString() string
 	GetOperation([]domain.CandleStick) *domain.Operation
 }

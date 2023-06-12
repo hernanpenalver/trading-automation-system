@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"time"
 	"trading-automation-system/api/internal/utils/maths"
 )
@@ -94,6 +95,10 @@ func (o *Operation) GetPercentNetBalance() float64 {
 	}
 
 	return 0
+}
+
+func (o *Operation) ToString() string {
+	return fmt.Sprintf("[operation:%s][entry_price:%f][close_data.price:%f][close_data.reason:%s][entry_date:%s]", o.Operation, o.EntryPrice, o.CloseData.Price, o.CloseData.Reason, o.GetEntryDate())
 }
 
 type Action string

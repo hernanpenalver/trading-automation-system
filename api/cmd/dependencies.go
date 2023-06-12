@@ -14,7 +14,7 @@ type handlersRepository struct {
 func InjectDependencies() *handlersRepository {
 	marketManager := MarketManagers.NewBinanceApi()
 	strategyExecutor := executors.NewDefaultStrategyExecutor(marketManager)
-	genericExecutorService := services.NewGenericExecutor(strategyExecutor)
+	genericExecutorService := services.NewGenericExecutor(strategyExecutor, marketManager)
 	genericExecutor := handlers.NewGenericExecutor(genericExecutorService)
 	return &handlersRepository{
 		GenericExecutor: genericExecutor,

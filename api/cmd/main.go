@@ -30,7 +30,7 @@ func main() {
 
 	marketManager := MarketManagers.NewBinanceApi()
 	strategyExecutor := executors.NewDefaultStrategyExecutor(marketManager)
-	genericExecutorService := services.NewGenericExecutor(strategyExecutor)
+	genericExecutorService := services.NewGenericExecutor(strategyExecutor, marketManager)
 	genericExecutor := handlers.NewGenericExecutor(genericExecutorService)
 
 	router := gin.New()

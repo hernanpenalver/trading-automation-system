@@ -1,21 +1,22 @@
-package domain
+package executors
 
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"trading-automation-system/api/internal/domain"
 )
 
 func TestStrategyExecutorResult_GetStrategyPercentBalance(t *testing.T) {
 	t.Run("10 % + 10 %", func(t *testing.T) {
 		strategyExecutorResult := StrategyExecutorResult{
 			PotentialOperations: nil,
-			ClosedOperations:    []*Operation{
+			ClosedOperations: []*domain.Operation{
 				{
 					Operation:  "buy",
 					Amount:     1,
 					EntryPrice: 100,
 					TakeProfit: 110,
-					CloseData:  &CloseData{
+					CloseData: &domain.CloseData{
 						Price:  110,
 						Reason: "take_profit",
 					},
@@ -25,13 +26,13 @@ func TestStrategyExecutorResult_GetStrategyPercentBalance(t *testing.T) {
 					Amount:     1,
 					EntryPrice: 100,
 					TakeProfit: 110,
-					CloseData:  &CloseData{
+					CloseData: &domain.CloseData{
 						Price:  110,
 						Reason: "take_profit",
 					},
 				},
 			},
-			OpenedOperations:    nil,
+			OpenedOperations: nil,
 		}
 
 		assert.Equal(t, float64(20), strategyExecutorResult.GetStrategyPercentBalance())
@@ -40,13 +41,13 @@ func TestStrategyExecutorResult_GetStrategyPercentBalance(t *testing.T) {
 	t.Run("10 % - 10 %", func(t *testing.T) {
 		strategyExecutorResult := StrategyExecutorResult{
 			PotentialOperations: nil,
-			ClosedOperations:    []*Operation{
+			ClosedOperations: []*domain.Operation{
 				{
 					Operation:  "buy",
 					Amount:     1,
 					EntryPrice: 100,
 					TakeProfit: 110,
-					CloseData:  &CloseData{
+					CloseData: &domain.CloseData{
 						Price:  110,
 						Reason: "take_profit",
 					},
@@ -55,13 +56,13 @@ func TestStrategyExecutorResult_GetStrategyPercentBalance(t *testing.T) {
 					Operation:  "buy",
 					Amount:     1,
 					EntryPrice: 100,
-					CloseData:  &CloseData{
+					CloseData: &domain.CloseData{
 						Price:  90,
 						Reason: "stop_loss",
 					},
 				},
 			},
-			OpenedOperations:    nil,
+			OpenedOperations: nil,
 		}
 
 		assert.Equal(t, float64(0), strategyExecutorResult.GetStrategyPercentBalance())
@@ -71,13 +72,13 @@ func TestStrategyExecutorResult_GetStrategyPercentBalance(t *testing.T) {
 func TestStrategyExecutorResult_GetInvestmentBalance(t *testing.T) {
 	strategyExecutorResult := StrategyExecutorResult{
 		PotentialOperations: nil,
-		ClosedOperations:    []*Operation{
+		ClosedOperations: []*domain.Operation{
 			{
 				Operation:  "buy",
 				Amount:     1,
 				EntryPrice: 100,
 				TakeProfit: 110,
-				CloseData:  &CloseData{
+				CloseData: &domain.CloseData{
 					Price:  110,
 					Reason: "take_profit",
 				},
@@ -87,13 +88,13 @@ func TestStrategyExecutorResult_GetInvestmentBalance(t *testing.T) {
 				Amount:     1,
 				EntryPrice: 100,
 				TakeProfit: 110,
-				CloseData:  &CloseData{
+				CloseData: &domain.CloseData{
 					Price:  110,
 					Reason: "take_profit",
 				},
 			},
 		},
-		OpenedOperations:    nil,
+		OpenedOperations: nil,
 	}
 
 	assert.Equal(t, float64(121), strategyExecutorResult.GetInvestmentBalance(100))
