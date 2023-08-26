@@ -2,6 +2,7 @@ package presenters
 
 import (
 	"trading-automation-system/api/internal/domain"
+	"trading-automation-system/api/internal/executors"
 	"trading-automation-system/api/internal/metrics"
 	"trading-automation-system/api/internal/strategies_context"
 )
@@ -13,11 +14,11 @@ func NewMetricPresenter() *MetricPresenter {
 	return &MetricPresenter{}
 }
 
-func (c *MetricPresenter) Execute(strategy *domain.StrategyConfig, strategyContext *strategies_context.StrategyContext, strategyResult *domain.StrategyExecutorResult) {
+func (c *MetricPresenter) Execute(strategy *domain.StrategyConfig, strategyContext *strategies_context.StrategyContext, strategyResult *executors.StrategyExecutorResult) {
 	c.execute(strategy, strategyContext, strategyResult)
 }
 
-func (c *MetricPresenter) execute(strategy *domain.StrategyConfig, strategyContext *strategies_context.StrategyContext, strategyResult *domain.StrategyExecutorResult) {
+func (c *MetricPresenter) execute(strategy *domain.StrategyConfig, strategyContext *strategies_context.StrategyContext, strategyResult *executors.StrategyExecutorResult) {
 	investmentBalance := strategyResult.GetInvestmentBalance(strategyContext.Investment.Amount)
 	percentBalance := strategyResult.GetStrategyPercentBalance(strategyContext.Investment.Amount)
 

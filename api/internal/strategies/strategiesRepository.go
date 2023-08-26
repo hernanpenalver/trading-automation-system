@@ -1,23 +1,23 @@
 package strategies
 
-import (
-	"trading-automation-system/api/internal/constants"
-	"trading-automation-system/api/internal/domain"
+const (
+	CrossingSimpleMovingAverageName = "crossing_simple_moving_average"
+	LowrySystemName                 = "lowry_system"
 )
 
-var StrategyRepository = map[string]func(b *domain.StrategyConfig) StrategyInterface{
-	constants.CrossingSimpleMovingAverage: func(b *domain.StrategyConfig) StrategyInterface {
-		return NewCrossingSimpleMovingAveragesFromConfig(b)
+var StrategyRepository = map[string]func() StrategyInterface{
+	CrossingSimpleMovingAverageName: func() StrategyInterface {
+		return NewCrossingSimpleMovingAverages()
 	},
-	constants.LowrySystem: func(b *domain.StrategyConfig) StrategyInterface {
-		return NewLowrySystemFromConfig(b)
-	},
+	//LowrySystemName: func(b *Context) StrategyInterface {
+	//	return NewLowrySystemFromConfig(b)
+	//},
 }
 
-func GetStrategyRepository(strategyConfig *domain.StrategyConfig) StrategyInterface {
-	if a, ok := StrategyRepository[strategyConfig.Name]; ok {
-		return a(strategyConfig)
+func GetStrategyRepository(name string) StrategyInterface {
+	if a, ok := StrategyRepository[name]; ok {
+		return a()
 	}
 
-	return nil
+	panic("strategy not found")
 }

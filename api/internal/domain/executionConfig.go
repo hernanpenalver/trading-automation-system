@@ -7,43 +7,47 @@ import (
 )
 
 type ExecutionConfig struct {
-	Strategies []*StrategyConfig   `json:"strategies"`
+	Strategies []StrategyConfig    `json:"strategies"`
 	Investment InvestmentConfig    `json:"investment"`
 	DateFrom   string              `json:"date_from"`
 	DateTo     string              `json:"date_to"`
 	Timeframe  constants.TimeFrame `json:"timeframe"`
 	Symbol     constants.Symbol    `json:"symbol"`
+	Presenters []PresentersConfig  `json:"presenters"`
 }
 
 type StrategyConfig struct {
-	Name       string       `json:"name"`
-	Parameters []*Parameter `json:"parameters"`
+	Name       string      `json:"name"`
+	Parameters []Parameter `json:"parameters"`
 }
 
 type Parameter struct {
-	Name  string `json:"name"`
-	Value int    `json:"value"`
-	Min   int    `json:"min"`
-	Max   int    `json:"max"`
+	Type string      `json:"type"`
+	Name string      `json:"name"`
+	Data interface{} `json:"data"`
 }
 
 type InvestmentConfig struct {
 	InitialAmount float64 `json:"initial_amount"`
 }
 
-func (s *StrategyConfig) GetParameter(name string) *Parameter {
-	for _, parameter := range s.Parameters {
-		if parameter.Name == name {
-			return parameter
-		}
-	}
-	return nil
+type PresentersConfig struct {
+	Name string `json:"name"`
 }
+
+//func (s *StrategyConfig) GetParameter(name string) *Parameter {
+//	for _, parameter := range s.Parameters {
+//		if parameter.Name == name {
+//			return parameter
+//		}
+//	}
+//	return nil
+//}
 
 func (s *StrategyConfig) StringifyParams() string {
 	var stringifyParams string
 	for _, parameter := range s.Parameters {
-		stringifyParams += fmt.Sprintf("%s_%d", parameter.Name, parameter.Value)
+		stringifyParams += fmt.Sprintf("%s_%v", parameter.Name, parameter.Data)
 	}
 	return stringifyParams
 }

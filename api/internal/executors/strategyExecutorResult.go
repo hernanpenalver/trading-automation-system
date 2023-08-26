@@ -1,16 +1,19 @@
-package domain
+package executors
 
 import (
+	"trading-automation-system/api/internal/domain"
+	"trading-automation-system/api/internal/strategies"
 	"trading-automation-system/api/internal/utils/maths"
 )
 
 type StrategyExecutorResult struct {
-	PotentialOperations []*Operation
-	ClosedOperations    []*Operation
-	OpenedOperations    []*Operation
+	Strategy            strategies.StrategyInterface
+	PotentialOperations []*domain.Operation
+	ClosedOperations    []*domain.Operation
+	OpenedOperations    []*domain.Operation
 }
 
-func (s *StrategyExecutorResult) GetQuantityOperationsClosedBy(reason CloseReason) int {
+func (s *StrategyExecutorResult) GetQuantityOperationsClosedBy(reason domain.CloseReason) int {
 	var quantity int
 	for _, o := range s.ClosedOperations {
 		if o.CloseData.Reason == reason {
@@ -35,7 +38,7 @@ func (s *StrategyExecutorResult) GetStrategyBalance() float64 {
 	var strategyBalance float64
 
 	for _, co := range s.ClosedOperations {
-		if co.CloseData.Reason == TakeProfitReason || co.CloseData.Reason == StopLossReason {
+		if co.CloseData.Reason == domain.TakeProfitReason || co.CloseData.Reason == domain.StopLossReason {
 			strategyBalance += co.GetNetBalance()
 		}
 	}
@@ -77,9 +80,9 @@ func (s *StrategyExecutorResult) GetStrategyPercentBalance(investmentAmount floa
 
 func (s *StrategyExecutorResult) GetInvestmentBalance(investmentAmount float64) float64 {
 	for _, co := range s.ClosedOperations {
-		if co.CloseData.Reason == TakeProfitReason ||
-			co.CloseData.Reason == StopLossReason ||
-			co.CloseData.Reason == CloseConditionReason {
+		if co.CloseData.Reason == domain.TakeProfitReason ||
+			co.CloseData.Reason == domain.StopLossReason ||
+			co.CloseData.Reason == domain.CloseConditionReason {
 
 			percent := co.GetPercentNetBalance()
 			investmentAmount = maths.PlusPercentage(investmentAmount, percent)

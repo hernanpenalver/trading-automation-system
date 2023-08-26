@@ -30,13 +30,13 @@ func main() {
 
 	marketManager := MarketManagers.NewBinanceApi()
 	strategyExecutor := executors.NewDefaultStrategyExecutor(marketManager)
-	genericExecutorService := services.NewGenericExecutor(strategyExecutor)
+	genericExecutorService := services.NewGenericExecutor(strategyExecutor, marketManager)
 	genericExecutor := handlers.NewGenericExecutor(genericExecutorService)
 
 	router := gin.New()
 
 	router.GET("/ping", handlers.Ping)
-	router.POST("/execute", genericExecutor.Execute)
+	router.POST("/backtest/execute", genericExecutor.Execute)
 	router.GET("/prometheus", prometheusHandler())
 
 	fmt.Println("Serving requests on port 9000")
