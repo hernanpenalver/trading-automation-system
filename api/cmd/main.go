@@ -10,6 +10,7 @@ import (
 	"trading-automation-system/api/internal/handlers"
 	"trading-automation-system/api/internal/metrics"
 	"trading-automation-system/api/internal/services"
+	"trading-automation-system/api/internal/usecase/livetest"
 )
 
 func init() {
@@ -33,10 +34,15 @@ func main() {
 	genericExecutorService := services.NewGenericExecutor(strategyExecutor, marketManager)
 	genericExecutor := handlers.NewGenericExecutor(genericExecutorService)
 
+	binanceStream := MarketManagers.NewBinanceStream()
+	liveExecutor := livetest.NewLiveExecutor(binanceStream)
+	liveExecutorHandler := handlers.NewLiveExecutor(liveExecutor)
+
 	router := gin.New()
 
 	router.GET("/ping", handlers.Ping)
 	router.POST("/backtest/execute", genericExecutor.Execute)
+	router.POST("/livetest/execute", liveExecutorHandler.Execute)
 	router.GET("/prometheus", prometheusHandler())
 
 	fmt.Println("Serving requests on port 9000")
