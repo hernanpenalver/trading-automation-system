@@ -8,4 +8,5 @@ type CandleStick struct {
 	Max          float64
 	Min          float64
 	OpenDateTime string
+	IsClose      bool
 }

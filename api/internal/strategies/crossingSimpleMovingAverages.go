@@ -71,9 +71,11 @@ func (c *CrossingSimpleMovingAverages) GetOperation(candleStickList []domain.Can
 
 				if series.CrossUnder(fastSmaResult, slowSmaResult) {
 					lastPrice := candleStickList[len(candleStickList)-1].Close
+					closeTime := candleStickList[len(candleStickList)-1].CloseTime
 					return true, &domain.CloseData{
 						Price:  lastPrice,
 						Reason: domain.CloseConditionReason,
+						Date:   closeTime,
 					}
 				}
 				return false, nil
@@ -98,9 +100,11 @@ func (c *CrossingSimpleMovingAverages) GetOperation(candleStickList []domain.Can
 
 				if series.CrossOver(fastSmaResult, slowSmaResult) {
 					lastPrice := candleStickList[len(candleStickList)-1].Close
+					closeTime := candleStickList[len(candleStickList)-1].CloseTime
 					return true, &domain.CloseData{
 						Price:  lastPrice,
 						Reason: domain.CloseConditionReason,
+						Date:   closeTime,
 					}
 				}
 				return false, nil

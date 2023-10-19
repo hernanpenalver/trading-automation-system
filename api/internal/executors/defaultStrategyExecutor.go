@@ -1,6 +1,7 @@
 package executors
 
 import (
+	"time"
 	"trading-automation-system/api/internal/MarketManagers"
 	"trading-automation-system/api/internal/domain"
 	"trading-automation-system/api/internal/strategies"
@@ -57,6 +58,7 @@ func (d *DefaultStrategyExecutor) Run(strategy strategies.StrategyInterface, can
 				o.CloseData = &domain.CloseData{
 					Price:  o.StopLoss,
 					Reason: domain.StopLossReason,
+					Date:   candleStickList[i].CloseTime,
 				}
 
 				idsClosed = append(idsClosed, o.ID)
@@ -74,11 +76,15 @@ func (d *DefaultStrategyExecutor) Run(strategy strategies.StrategyInterface, can
 		o.CloseData = &domain.CloseData{
 			Price:  candleStickList[len(candleStickList)-1].Close,
 			Reason: domain.ForceCloseReason,
+			Date:   candleStickList[len(candleStickList)-1].CloseTime,
 		}
 		closedOperations = append(closedOperations, o)
 	}
 
+	now := time.Now()
 	return &StrategyExecutorResult{
+		ID:                  "",
+		ExecutionDate:       &now,
 		Strategy:            strategy,
 		PotentialOperations: potentialOperations,
 		ClosedOperations:    closedOperations,

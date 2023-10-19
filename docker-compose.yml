@@ -18,6 +18,7 @@ services:
       - '9000:9000'
   prometheus:
     image: prom/prometheus:v2.24.0
+    container_name: prometheus
     volumes:
       - ./prometheus/:/etc/prometheus/
       - prometheus_data:/prometheus
