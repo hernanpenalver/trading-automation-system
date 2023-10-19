@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"time"
 	"trading-automation-system/api/internal/utils/maths"
 )
@@ -20,6 +21,11 @@ type Operation struct {
 type CloseData struct {
 	Price  float64
 	Reason CloseReason
+	Date   int64
+}
+
+func (cd *CloseData) GetDate() time.Time {
+	return time.Unix(0, cd.Date*int64(time.Millisecond))
 }
 
 func (o *Operation) GetEntryDate() time.Time {
@@ -86,14 +92,18 @@ func (o *Operation) GetPercentNetBalance() float64 {
 	}
 
 	if o.IsBuy() {
-		return maths.GetPercentageOf(o.EntryPrice, (o.Amount*o.CloseData.Price)-(o.Amount*o.EntryPrice))
+		return maths.GetPercentageOf(o.Amount*o.EntryPrice, (o.Amount*o.CloseData.Price)-(o.Amount*o.EntryPrice))
 	}
 
 	if o.IsSell() {
-		return maths.GetPercentageOf(o.EntryPrice, (o.Amount*o.EntryPrice)-(o.Amount*o.CloseData.Price))
+		return maths.GetPercentageOf(o.Amount*o.EntryPrice, (o.Amount*o.EntryPrice)-(o.Amount*o.CloseData.Price))
 	}
 
 	return 0
+}
+
+func (o *Operation) ToString() string {
+	return fmt.Sprintf("[operation:%s][entry_price:%f][close_data.price:%f][close_data.reason:%s][entry_date:%s]", o.Operation, o.EntryPrice, o.CloseData.Price, o.CloseData.Reason, o.GetEntryDate())
 }
 
 type Action string

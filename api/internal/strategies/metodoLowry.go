@@ -1,8 +1,8 @@
 package strategies
 
 import (
+	"fmt"
 	"github.com/google/uuid"
-	"trading-automation-system/api/internal/constants"
 	"trading-automation-system/api/internal/domain"
 	"trading-automation-system/api/internal/indicators"
 	"trading-automation-system/api/internal/utils/series"
@@ -19,18 +19,28 @@ const lenght4Sma = "lenght_4_sma"
 const lenght18Sma = "lenght_18_sma"
 const lenght40Sma = "lenght_40_sma"
 
-func NewLowrySystemFromConfig(strategyConfig *domain.StrategyConfig) *LowrySystem {
-
+func NewLowrySystem() *LowrySystem {
 	return &LowrySystem{
-		Name:        constants.LowrySystem,
-		Lenght4Sma:  indicators.NewSimpleMovingAverageFromConfig(strategyConfig.GetParameter(lenght4Sma)),
-		Lenght18Sma: indicators.NewSimpleMovingAverageFromConfig(strategyConfig.GetParameter(lenght18Sma)),
-		Lenght40Sma: indicators.NewSimpleMovingAverageFromConfig(strategyConfig.GetParameter(lenght40Sma)),
+		Name:        LowrySystemName,
+		Lenght4Sma:  indicators.NewSimpleMovingAverage(4, "close"),
+		Lenght18Sma: indicators.NewSimpleMovingAverage(18, "close"),
+		Lenght40Sma: indicators.NewSimpleMovingAverage(40, "close"),
 	}
+}
+
+func (c *LowrySystem) SetParameters(strategyContext *Context) {
+	c.Lenght4Sma.Length = strategyContext.GetParameter(lenght4Sma).GetIntValue()
+	c.Lenght18Sma.Length = strategyContext.GetParameter(lenght18Sma).GetIntValue()
+	c.Lenght40Sma.Length = strategyContext.GetParameter(lenght40Sma).GetIntValue()
 }
 
 func (c *LowrySystem) GetName() string {
 	return c.Name
+}
+
+func (c *LowrySystem) ToString() string {
+	return fmt.Sprintf("%s_%d-%s_%d-%s_%d", lenght4Sma, c.Lenght4Sma.Length, lenght18Sma, c.Lenght18Sma.Length,
+		lenght40Sma, c.Lenght40Sma.Length)
 }
 
 func (c *LowrySystem) GetOperation(candleStickList []domain.CandleStick) *domain.Operation {
