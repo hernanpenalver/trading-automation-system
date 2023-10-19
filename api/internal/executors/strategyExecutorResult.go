@@ -1,12 +1,15 @@
 package executors
 
 import (
+	"time"
 	"trading-automation-system/api/internal/domain"
 	"trading-automation-system/api/internal/strategies"
 	"trading-automation-system/api/internal/utils/maths"
 )
 
 type StrategyExecutorResult struct {
+	ID                  string
+	ExecutionDate       *time.Time
 	Strategy            strategies.StrategyInterface
 	PotentialOperations []*domain.Operation
 	ClosedOperations    []*domain.Operation
@@ -34,16 +37,18 @@ func (s *StrategyExecutorResult) GetCompleteBalance() float64 {
 	return completeBalance
 }
 
-func (s *StrategyExecutorResult) GetStrategyBalance() float64 {
+func (s *StrategyExecutorResult) GetStrategyBalance(initialInvestment float64) float64 {
 	var strategyBalance float64
 
 	for _, co := range s.ClosedOperations {
-		if co.CloseData.Reason == domain.TakeProfitReason || co.CloseData.Reason == domain.StopLossReason {
+		if co.CloseData.Reason == domain.TakeProfitReason ||
+			co.CloseData.Reason == domain.StopLossReason ||
+			co.CloseData.Reason == domain.CloseConditionReason {
 			strategyBalance += co.GetNetBalance()
 		}
 	}
 
-	return strategyBalance
+	return strategyBalance + initialInvestment
 }
 
 func (s *StrategyExecutorResult) GetWinnersQuantity() int64 {
@@ -75,19 +80,5 @@ func (s *StrategyExecutorResult) GetStrategyPercentBalance(investmentAmount floa
 		investmentAmount = 100
 	}
 
-	return maths.GetPercentageOf(investmentAmount, s.GetInvestmentBalance(investmentAmount)) - 100
-}
-
-func (s *StrategyExecutorResult) GetInvestmentBalance(investmentAmount float64) float64 {
-	for _, co := range s.ClosedOperations {
-		if co.CloseData.Reason == domain.TakeProfitReason ||
-			co.CloseData.Reason == domain.StopLossReason ||
-			co.CloseData.Reason == domain.CloseConditionReason {
-
-			percent := co.GetPercentNetBalance()
-			investmentAmount = maths.PlusPercentage(investmentAmount, percent)
-		}
-	}
-
-	return investmentAmount
+	return maths.GetPercentageOf(investmentAmount, s.GetStrategyBalance(0))
 }

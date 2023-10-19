@@ -16,6 +16,7 @@ import (
 func init() {
 	prometheus.MustRegister(metrics.StrategiesResultsByInvestment)
 	prometheus.MustRegister(metrics.StrategiesResultsByPercentBalance)
+	prometheus.MustRegister(metrics.TradesResultsByPercentBalance)
 }
 
 func prometheusHandler() gin.HandlerFunc {

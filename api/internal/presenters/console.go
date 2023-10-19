@@ -40,7 +40,7 @@ func (c *ConsolePresenter) execute(strategy *domain.StrategyConfig, strategyCont
 		log.Printf("Closed operations by stop loss: %d\n", strategyResult.GetQuantityOperationsClosedBy(domain.StopLossReason))
 		log.Printf("Closed operations by force close: %d\n", strategyResult.GetQuantityOperationsClosedBy(domain.ForceCloseReason))
 		log.Printf("Strategy Percent Balance: %f\n", strategyResult.GetStrategyPercentBalance(strategyContext.Investment.Amount))
-		investmentBalance := strategyResult.GetInvestmentBalance(strategyContext.Investment.Amount)
+		investmentBalance := strategyResult.GetStrategyBalance(strategyContext.Investment.Amount)
 		log.Printf("Strategy Investment Balance: %f\n", investmentBalance)
 		//for _, op := range strategyResult.ClosedOperations {
 		//	log.Printf(op.ToString())

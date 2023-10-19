@@ -9,9 +9,9 @@ var StrategyRepository = map[string]func() StrategyInterface{
 	CrossingSimpleMovingAverageName: func() StrategyInterface {
 		return NewCrossingSimpleMovingAverages()
 	},
-	//LowrySystemName: func(b *Context) StrategyInterface {
-	//	return NewLowrySystemFromConfig(b)
-	//},
+	LowrySystemName: func() StrategyInterface {
+		return NewLowrySystem()
+	},
 }
 
 func GetStrategyRepository(name string) StrategyInterface {
