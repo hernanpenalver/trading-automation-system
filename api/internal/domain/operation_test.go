@@ -40,6 +40,24 @@ func TestOperation_GetPercentNetBalance(t *testing.T) {
 		assert.Equal(t, float64(10), operation.GetPercentNetBalance())
 	})
 
+	t.Run("buy + 10% - Fee", func(t *testing.T) {
+		operation := &Operation{
+			ID:         "",
+			Operation:  BuyAction,
+			Amount:     1,
+			EntryPrice: 100,
+			StopLoss:   0,
+			TakeProfit: 110,
+			Fee:        1,
+			CloseData: &CloseData{
+				Price:  110,
+				Reason: "",
+			},
+		}
+
+		assert.Equal(t, float64(9), operation.GetPercentNetBalance())
+	})
+
 	t.Run("buy + 1%", func(t *testing.T) {
 		operation := &Operation{
 			ID:         "",

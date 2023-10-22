@@ -8,16 +8,16 @@ import (
 	"trading-automation-system/api/internal/strategies"
 )
 
-type LiveExecutor struct {
+type Service struct {
 	Market    *MarketManagers.BinanceStream
 	MarketApi *MarketManagers.BinanceApi
 }
 
-func NewLiveExecutor(market *MarketManagers.BinanceStream) *LiveExecutor {
-	return &LiveExecutor{Market: market}
+func NewService(market *MarketManagers.BinanceStream) *Service {
+	return &Service{Market: market}
 }
 
-func (l *LiveExecutor) Execute() (interface{}, error) {
+func (l *Service) Execute() (interface{}, error) {
 	strategy := strategies.CrossingSimpleMovingAverages{
 		Name:    strategies.CrossingSimpleMovingAverageName,
 		FastSma: indicators.NewSimpleMovingAverage(37, indicators.CloseSource),

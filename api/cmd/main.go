@@ -5,12 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"trading-automation-system/api/internal/MarketManagers"
-	"trading-automation-system/api/internal/executors"
 	"trading-automation-system/api/internal/handlers"
 	"trading-automation-system/api/internal/metrics"
-	"trading-automation-system/api/internal/services"
-	"trading-automation-system/api/internal/usecase/livetest"
 )
 
 func init() {
@@ -28,22 +24,12 @@ func prometheusHandler() gin.HandlerFunc {
 }
 
 func main() {
-	//dependencies := InjectDependencies()
-
-	marketManager := MarketManagers.NewBinanceApi()
-	strategyExecutor := executors.NewDefaultStrategyExecutor(marketManager)
-	genericExecutorService := services.NewGenericExecutor(strategyExecutor, marketManager)
-	genericExecutor := handlers.NewGenericExecutor(genericExecutorService)
-
-	binanceStream := MarketManagers.NewBinanceStream()
-	liveExecutor := livetest.NewLiveExecutor(binanceStream)
-	liveExecutorHandler := handlers.NewLiveExecutor(liveExecutor)
+	dependencies := injectDependencies()
 
 	router := gin.New()
-
 	router.GET("/ping", handlers.Ping)
-	router.POST("/backtest/execute", genericExecutor.Execute)
-	router.POST("/livetest/execute", liveExecutorHandler.Execute)
+	router.POST("/backtest/execute", dependencies.Backtest.Execute)
+	router.POST("/livetest/execute", dependencies.Live.Execute)
 	router.GET("/prometheus", prometheusHandler())
 
 	fmt.Println("Serving requests on port 9000")

@@ -1,4 +1,4 @@
-package services
+package backtest
 
 import (
 	"encoding/json"
@@ -12,16 +12,16 @@ import (
 	"trading-automation-system/api/internal/utils/slices"
 )
 
-type GenericExecutor struct {
-	backtestStrategyExecutor executors.StrategyExecutorInterface
-	marketManager            MarketManagers.MarketManagerInterface
+type Service struct {
+	strategyExecutor executors.StrategyExecutorInterface
+	marketManager    MarketManagers.MarketManagerInterface
 }
 
-func NewGenericExecutor(backtestStrategyExecutor executors.StrategyExecutorInterface, marketManager MarketManagers.MarketManagerInterface) *GenericExecutor {
-	return &GenericExecutor{backtestStrategyExecutor: backtestStrategyExecutor, marketManager: marketManager}
+func NewService(strategyExecutor executors.StrategyExecutorInterface, marketManager MarketManagers.MarketManagerInterface) *Service {
+	return &Service{strategyExecutor: strategyExecutor, marketManager: marketManager}
 }
 
-func (e *GenericExecutor) Execute(config domain.ExecutionConfig) (*executors.StrategyExecutorResult, error) {
+func (e *Service) Execute(config domain.ExecutionConfig) (*executors.StrategyExecutorResult, error) {
 
 	candleStickList, err := e.marketManager.Get(config.Symbol, config.Timeframe, config.GetDateFrom(), config.GetDateTo())
 	if err != nil {
@@ -44,9 +44,7 @@ func (e *GenericExecutor) Execute(config domain.ExecutionConfig) (*executors.Str
 	return nil, nil
 }
 
-func (e *GenericExecutor) execute(strategyConfig *domain.StrategyConfig, candleStickList []domain.CandleStick) []executors.StrategyExecutorResult {
-	//log.Print(strategyConfig.Parameters[0].Value, " + ", strategyConfig.Parameters[1].Value)
-
+func (e *Service) execute(strategyConfig *domain.StrategyConfig, candleStickList []domain.CandleStick) []executors.StrategyExecutorResult {
 	currentParameters := strategies.NewContext(strategyConfig.Name, nil)
 	var results []executors.StrategyExecutorResult
 	for {
@@ -54,7 +52,7 @@ func (e *GenericExecutor) execute(strategyConfig *domain.StrategyConfig, candleS
 			strategy := strategies.GetStrategyRepository(strategyConfig.Name)
 			strategy.SetParameters(strategyContext)
 			log.Printf("GenericExecutor.execute - Execute with parameters [%s]", strategy.ToString())
-			defaultExecutorResult, err := e.backtestStrategyExecutor.Run(strategy, candleStickList)
+			defaultExecutorResult, err := e.strategyExecutor.Run(strategy, candleStickList)
 			if err != nil {
 				log.Print("GenericExecutor.execute - error executing strategy: ", err)
 			}
@@ -67,17 +65,6 @@ func (e *GenericExecutor) execute(strategyConfig *domain.StrategyConfig, candleS
 
 	return results
 }
-
-//func mapToExecutorContext(strategyConfig *domain.StrategyConfig) *strategies.Context {
-//	var strategyContextParameters []strategies.Parameter
-//	for _, parameter := range strategyConfig.Parameters {
-//		strategyContextParameters = append(strategyContextParameters, strategies.Parameter(parameter))
-//	}
-//	return &strategies.Context{
-//		Name:       strategyConfig.Name,
-//		Parameters: strategyContextParameters,
-//	}
-//}
 
 func optimize(configParameters []domain.Parameter, currentStrategyContext *strategies.Context) (bool, *strategies.Context) {
 	if len(currentStrategyContext.Parameters) == 0 {

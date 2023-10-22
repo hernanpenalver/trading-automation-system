@@ -6,17 +6,17 @@ import (
 	"trading-automation-system/api/internal/usecase/livetest"
 )
 
-type LiveExecutor struct {
-	executor *livetest.LiveExecutor
+type Live struct {
+	service *livetest.Service
 }
 
-func NewLiveExecutor(executor *livetest.LiveExecutor) *LiveExecutor {
-	return &LiveExecutor{executor: executor}
+func NewLive(Service *livetest.Service) *Live {
+	return &Live{service: Service}
 }
 
-func (e *LiveExecutor) Execute(c *gin.Context) {
+func (e *Live) Execute(c *gin.Context) {
 
-	_, err := e.executor.Execute()
+	_, err := e.service.Execute()
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return

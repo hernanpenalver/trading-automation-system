@@ -103,8 +103,10 @@ func (c *LowrySystem) delphicPhenomenon(candleStickList []domain.CandleStick) (b
 						Operation:  domain.BuyAction,
 						EntryPrice: entryPrice,
 						EntryDate:  entryDate,
+						//Amount:     investmentAmount / entryPrice,
 						Amount:     1,
 						TakeProfit: 1,
+						Fee:        0.00595706,
 						StopLoss:   lenght40SmaCollection[len(lenght40SmaCollection)-1],
 						CloseCondition: func(candleStickList []domain.CandleStick) (bool, *domain.CloseData) {
 							lenght4SmaResult := c.Lenght4Sma.Calculate(candleStickList)

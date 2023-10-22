@@ -13,6 +13,7 @@ type Operation struct {
 	EntryPrice     float64
 	StopLoss       float64
 	TakeProfit     float64
+	Fee            float64
 	CloseData      *CloseData
 	CloseCondition func(candleStickList []CandleStick) (bool, *CloseData)
 	EntryDate      int64
@@ -75,12 +76,12 @@ func (o *Operation) GetNetBalance() float64 {
 
 	if o.IsBuy() {
 		// (x*closePrice) - (x*entryPrice)
-		return (o.Amount * o.CloseData.Price) - (o.Amount * o.EntryPrice)
+		return (o.Amount * o.CloseData.Price) - (o.Amount * o.EntryPrice) - (2 * o.Fee)
 	}
 
 	if o.IsSell() {
 		// (x*entryPrice) - (x*closePrice)
-		return (o.Amount * o.EntryPrice) - (o.Amount * o.CloseData.Price)
+		return (o.Amount * o.EntryPrice) - (o.Amount * o.CloseData.Price) - (2 * o.Fee)
 	}
 
 	return 0
@@ -92,11 +93,13 @@ func (o *Operation) GetPercentNetBalance() float64 {
 	}
 
 	if o.IsBuy() {
-		return maths.GetPercentageOf(o.Amount*o.EntryPrice, (o.Amount*o.CloseData.Price)-(o.Amount*o.EntryPrice))
+		pnl := (o.Amount * o.CloseData.Price) - (o.Amount * o.EntryPrice) - (2 * o.Fee)
+		return maths.GetPercentageOf(o.Amount*o.EntryPrice, pnl)
 	}
 
 	if o.IsSell() {
-		return maths.GetPercentageOf(o.Amount*o.EntryPrice, (o.Amount*o.EntryPrice)-(o.Amount*o.CloseData.Price))
+		pnl := (o.Amount * o.EntryPrice) - (o.Amount * o.CloseData.Price) - (2 * o.Fee)
+		return maths.GetPercentageOf(o.Amount*o.EntryPrice, pnl)
 	}
 
 	return 0

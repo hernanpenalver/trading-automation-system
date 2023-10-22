@@ -4,18 +4,18 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"trading-automation-system/api/internal/domain"
-	"trading-automation-system/api/internal/services"
+	"trading-automation-system/api/internal/usecase/backtest"
 )
 
-type GenericExecutor struct {
-	executor *services.GenericExecutor
+type Backtest struct {
+	service *backtest.Service
 }
 
-func NewGenericExecutor(executor *services.GenericExecutor) *GenericExecutor {
-	return &GenericExecutor{executor: executor}
+func NewBacktest(service *backtest.Service) *Backtest {
+	return &Backtest{service: service}
 }
 
-func (e *GenericExecutor) Execute(c *gin.Context) {
+func (e *Backtest) Execute(c *gin.Context) {
 	var executionConfig domain.ExecutionConfig
 	err := c.BindJSON(&executionConfig)
 	if err != nil {
@@ -23,7 +23,7 @@ func (e *GenericExecutor) Execute(c *gin.Context) {
 		return
 	}
 
-	_, err = e.executor.Execute(executionConfig)
+	_, err = e.service.Execute(executionConfig)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
